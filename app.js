@@ -8,6 +8,36 @@ const pageLabel = document.getElementById("pageLabel");
 const prevPageButton = document.getElementById("prevPage");
 const nextPageButton = document.getElementById("nextPage");
 
+function openClipOne() {
+  const clipStage = document.createElement("section");
+  clipStage.className = "clip-stage";
+  clipStage.id = "clipStage";
+  clipStage.setAttribute("aria-label", "Clip 01 Testfläche");
+
+  clipStage.innerHTML = `
+    <div class="clip-stage__frame" aria-hidden="true">
+      <span class="clip-stage__corner clip-stage__corner--tl"></span>
+      <span class="clip-stage__corner clip-stage__corner--tr"></span>
+      <span class="clip-stage__corner clip-stage__corner--bl"></span>
+      <span class="clip-stage__corner clip-stage__corner--br"></span>
+
+      <span class="clip-stage__ornament clip-stage__ornament--top">◆</span>
+      <span class="clip-stage__ornament clip-stage__ornament--bottom">◆</span>
+      <span class="clip-stage__ornament clip-stage__ornament--left">✦</span>
+      <span class="clip-stage__ornament clip-stage__ornament--right">✦</span>
+    </div>
+  `;
+
+  document.body.appendChild(clipStage);
+}
+
+function closeClipStage() {
+  const clipStage = document.getElementById("clipStage");
+  if (clipStage) {
+    clipStage.remove();
+  }
+}
+
 function renderPage() {
   clipGrid.innerHTML = "";
 
@@ -28,10 +58,10 @@ function renderPage() {
 
     card.appendChild(number);
 
-    // Absichtlich noch keine Aktion:
-    // Die Clip-Karten sind bereits echte Buttons und damit später direkt anwählbar.
     card.addEventListener("click", () => {
-      // Noch leer.
+      if (clipNumber === 1) {
+        openClipOne();
+      }
     });
 
     clipGrid.appendChild(card);
@@ -52,6 +82,12 @@ nextPageButton.addEventListener("click", () => {
   if (currentPage >= TOTAL_PAGES) return;
   currentPage += 1;
   renderPage();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeClipStage();
+  }
 });
 
 renderPage();
