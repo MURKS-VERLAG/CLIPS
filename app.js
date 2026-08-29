@@ -13,26 +13,30 @@ function getClipStage() {
   return document.getElementById("clipStage");
 }
 
-function openClipOne() {
+function openClip(clipNumber) {
   const clipStage = getClipStage();
 
   if (!vault || !clipStage) {
-    console.error("Clip 01 kann nicht geöffnet werden: vault oder clipStage fehlt.");
+    console.error(`Clip ${String(clipNumber).padStart(2, "0")} kann nicht geöffnet werden.`);
     return;
   }
 
+  clipStage.dataset.activeClip = String(clipNumber);
+
   vault.style.display = "none";
   clipStage.hidden = false;
-  clipStage.style.setProperty("display", "grid", "important");
+  clipStage.style.setProperty("display", "block", "important");
 }
 
-function closeClipOne() {
+function closeClip() {
   const clipStage = getClipStage();
 
   if (!vault || !clipStage) return;
 
   clipStage.hidden = true;
   clipStage.style.setProperty("display", "none", "important");
+  clipStage.removeAttribute("data-active-clip");
+
   vault.style.display = "";
 }
 
@@ -68,10 +72,6 @@ function renderPage() {
   nextPageButton.disabled = currentPage === TOTAL_PAGES;
 }
 
-/*
-  Event-Delegation statt Einzel-Listener:
-  Dadurch funktioniert Clip 01 auch nach jedem erneuten renderPage().
-*/
 clipGrid.addEventListener("click", (event) => {
   const card = event.target.closest(".clip-card");
 
@@ -79,19 +79,21 @@ clipGrid.addEventListener("click", (event) => {
 
   const clipNumber = Number(card.dataset.clip);
 
-  if (clipNumber === 1) {
-    openClipOne();
+  if (clipNumber >= 1 && clipNumber <= 20) {
+    openClip(clipNumber);
   }
 });
 
 prevPageButton.addEventListener("click", () => {
   if (currentPage <= 1) return;
+
   currentPage -= 1;
   renderPage();
 });
 
 nextPageButton.addEventListener("click", () => {
   if (currentPage >= TOTAL_PAGES) return;
+
   currentPage += 1;
   renderPage();
 });
@@ -100,7 +102,7 @@ document.addEventListener("keydown", (event) => {
   const clipStage = getClipStage();
 
   if (event.key === "Escape" && clipStage && !clipStage.hidden) {
-    closeClipOne();
+    closeClip();
   }
 });
 
