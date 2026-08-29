@@ -1,4 +1,4 @@
-const TOTAL_PAGES = 2;
+const TOTAL_PAGES = 4;
 const CLIPS_PER_PAGE = 10;
 
 let currentPage = 1;
@@ -13,15 +13,29 @@ function getClipStage() {
   return document.getElementById("clipStage");
 }
 
+function getClipStageBackground() {
+  return document.getElementById("clipStageBackground");
+}
+
+function getFrameForClip(clipNumber) {
+  if (clipNumber >= 21 && clipNumber <= 40) {
+    return "assets/clip-frame-grid.png";
+  }
+
+  return "assets/clip-frame.png";
+}
+
 function openClip(clipNumber) {
   const clipStage = getClipStage();
+  const clipStageBackground = getClipStageBackground();
 
-  if (!vault || !clipStage) {
+  if (!vault || !clipStage || !clipStageBackground) {
     console.error(`Clip ${String(clipNumber).padStart(2, "0")} kann nicht geöffnet werden.`);
     return;
   }
 
   clipStage.dataset.activeClip = String(clipNumber);
+  clipStageBackground.src = getFrameForClip(clipNumber);
 
   vault.style.display = "none";
   clipStage.hidden = false;
@@ -79,7 +93,7 @@ clipGrid.addEventListener("click", (event) => {
 
   const clipNumber = Number(card.dataset.clip);
 
-  if (clipNumber >= 1 && clipNumber <= 20) {
+  if (clipNumber >= 1 && clipNumber <= 40) {
     openClip(clipNumber);
   }
 });
