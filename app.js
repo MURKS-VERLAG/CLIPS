@@ -8,21 +8,37 @@ const clipGrid = document.getElementById("clipGrid");
 const pageLabel = document.getElementById("pageLabel");
 const prevPageButton = document.getElementById("prevPage");
 const nextPageButton = document.getElementById("nextPage");
-const clipStage = document.getElementById("clipStage");
+
+function getClipStage() {
+  return document.getElementById("clipStage");
+}
 
 function openClipOne() {
+  const clipStage = getClipStage();
+
+  if (!vault || !clipStage) {
+    console.error("Clip 01 kann nicht geöffnet werden: vault oder clipStage fehlt.");
+    return;
+  }
+
   vault.style.display = "none";
   clipStage.hidden = false;
-  clipStage.style.display = "grid";
+  clipStage.style.setProperty("display", "grid", "important");
 }
 
 function closeClipOne() {
+  const clipStage = getClipStage();
+
+  if (!vault || !clipStage) return;
+
   clipStage.hidden = true;
-  clipStage.style.display = "none";
+  clipStage.style.setProperty("display", "none", "important");
   vault.style.display = "";
 }
 
 function renderPage() {
+  if (!clipGrid) return;
+
   clipGrid.innerHTML = "";
 
   const firstClipNumber = (currentPage - 1) * CLIPS_PER_PAGE + 1;
@@ -33,21 +49,17 @@ function renderPage() {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "clip-card";
-    card.dataset.clip = clipNumber;
-    card.setAttribute("aria-label", `Clip ${String(clipNumber).padStart(2, "0")}`);
+    card.dataset.clip = String(clipNumber);
+    card.setAttribute(
+      "aria-label",
+      `Clip ${String(clipNumber).padStart(2, "0")}`
+    );
 
     const number = document.createElement("span");
     number.className = "clip-card__number";
     number.textContent = String(clipNumber).padStart(2, "0");
 
     card.appendChild(number);
-
-    card.addEventListener("click", () => {
-      if (clipNumber === 1) {
-        openClipOne();
-      }
-    });
-
     clipGrid.appendChild(card);
   }
 
@@ -55,6 +67,22 @@ function renderPage() {
   prevPageButton.disabled = currentPage === 1;
   nextPageButton.disabled = currentPage === TOTAL_PAGES;
 }
+
+/*
+  Event-Delegation statt Einzel-Listener:
+  Dadurch funktioniert Clip 01 auch nach jedem erneuten renderPage().
+*/
+clipGrid.addEventListener("click", (event) => {
+  const card = event.target.closest(".clip-card");
+
+  if (!card || !clipGrid.contains(card)) return;
+
+  const clipNumber = Number(card.dataset.clip);
+
+  if (clipNumber === 1) {
+    openClipOne();
+  }
+});
 
 prevPageButton.addEventListener("click", () => {
   if (currentPage <= 1) return;
@@ -69,7 +97,9 @@ nextPageButton.addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !clipStage.hidden) {
+  const clipStage = getClipStage();
+
+  if (event.key === "Escape" && clipStage && !clipStage.hidden) {
     closeClipOne();
   }
 });
