@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070707">
+  <title>Animation Vault</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="vault" aria-label="Animation Vault">
+    <header class="vault__header">
+      <h1>ANIMATION VAULT</h1>
+      <p id="pageLabel" class="vault__page-label">SEITE 1 / 2</p>
+    </header>
+
+    <section id="clipGrid" class="clip-grid" aria-label="Clip-Auswahl"></section>
+
+    <nav class="page-nav" aria-label="Seitennavigation">
+      <button
+        id="prevPage"
+        class="page-nav__button page-nav__button--prev"
+        type="button"
+        aria-label="Vorherige Seite"
+        title="Vorherige Seite"
+      >
+        ←
+      </button>
+
+      <button
+        id="nextPage"
+        class="page-nav__button page-nav__button--next"
+        type="button"
+        aria-label="Nächste Seite"
+        title="Nächste Seite"
+      >
+        →
+      </button>
+    </nav>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
