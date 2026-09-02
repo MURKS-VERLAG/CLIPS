@@ -72,7 +72,7 @@
     .clip01-puff {
       position: absolute;
       z-index: 20;
-      width: clamp(70px, 9vw, 170px);
+      width: clamp(95px, 12vw, 230px);
       aspect-ratio: 1;
       transform: translate(-50%, -50%) scale(.25);
       opacity: 0;
@@ -106,7 +106,7 @@
     .clip01-puff--gold {
       background:
         radial-gradient(circle at 50% 50%, rgba(255,225,111,.98) 0 19%, rgba(214,164,43,.88) 21% 40%, rgba(111,70,5,.72) 42% 58%, transparent 72%);
-      filter: blur(1px) drop-shadow(0 0 14px rgba(241,194,69,.55));
+      filter: blur(1px) drop-shadow(0 0 18px rgba(241,194,69,.62));
     }
 
     .clip01-puff--gold::before {
@@ -120,14 +120,15 @@
     }
 
     .clip01-puff.is-active {
-      animation: clip01Puff .72s ease-out forwards;
+      animation: clip01Puff 1.25s ease-out forwards;
     }
 
     @keyframes clip01Puff {
-      0%   { opacity: 0; transform: translate(-50%, -50%) scale(.18); }
-      16%  { opacity: 1; transform: translate(-50%, -50%) scale(.72); }
-      52%  { opacity: .96; transform: translate(-50%, -50%) scale(1.16); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.52); }
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(.16); }
+      14%  { opacity: 1; transform: translate(-50%, -50%) scale(.72); }
+      48%  { opacity: .98; transform: translate(-50%, -50%) scale(1.18); }
+      76%  { opacity: .72; transform: translate(-50%, -50%) scale(1.42); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.72); }
     }
   </style>
 </head>
@@ -178,6 +179,6 @@
     <div id="clip01AnimationLayer" class="clip01-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip01-sequence-02"></script>
+  <script src="app.js?v=clip01-sequence-03"></script>
 </body>
 </html>

@@ -110,37 +110,29 @@ function fadeInSymbol(symbol, duration = 560) {
 
 function orbitSymbols(symbols, duration, token) {
   const center = { x: 50, y: 50 };
-  const radiusX = 20.5;
-  const radiusY = 16.8;
+  const ellipseYScale = 0.82;
 
   /*
-    Alle Symbole laufen auf derselben Ellipse.
-    Dadurch können sich die Bahnen nicht gegenseitig schneiden.
-    Für die beiden Helme erzwingen wir extra Abstand.
+    WICHTIG:
+    Jeder Orbit startet EXAKT an der aktuellen sichtbaren Startposition
+    des Symbols und endet nach 360° wieder EXAKT dort.
+    Damit gibt es vor und nach der Kreisfahrt keinen Sprung mehr.
   */
-  const forcedAngles = {
-    "helmet-left": -108,
-    "helmet-right": -72,
-    "sword-right": 0,
-    "wheel": 42,
-    "bottom-shield": 90,
-    "cup": 138,
-    "sword-left": 180
-  };
-
   const orbitData = symbols.map((symbol) => {
-    const fallbackAngle = Math.atan2(
-      (symbol.start.y - center.y) / radiusY,
-      (symbol.start.x - center.x) / radiusX
-    );
+    const dx = symbol.start.x - center.x;
+    const dy = symbol.start.y - center.y;
 
-    const angleDeg = Object.prototype.hasOwnProperty.call(forcedAngles, symbol.key)
-      ? forcedAngles[symbol.key]
-      : fallbackAngle * 180 / Math.PI;
+    const radiusX = Math.hypot(dx, dy / ellipseYScale);
+    const angle = Math.atan2(
+      dy / ellipseYScale,
+      dx
+    );
 
     return {
       symbol,
-      angle: angleDeg * Math.PI / 180
+      radiusX,
+      radiusY: radiusX * ellipseYScale,
+      angle
     };
   });
 
@@ -160,7 +152,7 @@ function orbitSymbols(symbols, duration, token) {
 
       const rotation = eased * Math.PI * 2;
 
-      orbitData.forEach(({ symbol, angle }) => {
+      orbitData.forEach(({ symbol, radiusX, radiusY, angle }) => {
         const a = angle + rotation;
         const x = center.x + Math.cos(a) * radiusX;
         const y = center.y + Math.sin(a) * radiusY;
@@ -174,6 +166,7 @@ function orbitSymbols(symbols, duration, token) {
       } else {
         clip01Raf = null;
 
+        // Exakt auf Ausgangskoordinaten fixieren.
         symbols.forEach((symbol) => {
           symbol.el.style.left = `${symbol.start.x}%`;
           symbol.el.style.top = `${symbol.start.y}%`;
@@ -229,7 +222,7 @@ function puffAt(x, y, type = "dark") {
     puff.classList.add("is-active");
   });
 
-  setTimeout(() => puff.remove(), 850);
+  setTimeout(() => puff.remove(), 1450);
 }
 
 async function crossfadeBackground(src, token) {
@@ -359,7 +352,8 @@ async function playClip01() {
   await Promise.all(orbiters.map((symbol) => fadeInSymbol(symbol, 520)));
   if (token !== clip01RunToken) return;
 
-  if (!(await waitClip01(260, token))) return;
+  // NEU: Alle Symbole stehen 1,5 Sekunden ruhig, bevor die Kreisfahrt beginnt.
+  if (!(await waitClip01(1500, token))) return;
 
   // 3) Eine komplette Kreisfahrt im Uhrzeigersinn.
   // Die beiden Helme bleiben dabei bewusst getrennt.
