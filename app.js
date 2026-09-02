@@ -110,16 +110,37 @@ function fadeInSymbol(symbol, duration = 560) {
 
 function orbitSymbols(symbols, duration, token) {
   const center = { x: 50, y: 50 };
+  const radiusX = 20.5;
+  const radiusY = 16.8;
+
+  /*
+    Alle Symbole laufen auf derselben Ellipse.
+    Dadurch können sich die Bahnen nicht gegenseitig schneiden.
+    Für die beiden Helme erzwingen wir extra Abstand.
+  */
+  const forcedAngles = {
+    "helmet-left": -108,
+    "helmet-right": -72,
+    "sword-right": 0,
+    "wheel": 42,
+    "bottom-shield": 90,
+    "cup": 138,
+    "sword-left": 180
+  };
 
   const orbitData = symbols.map((symbol) => {
-    const dx = symbol.start.x - center.x;
-    const dy = symbol.start.y - center.y;
+    const fallbackAngle = Math.atan2(
+      (symbol.start.y - center.y) / radiusY,
+      (symbol.start.x - center.x) / radiusX
+    );
+
+    const angleDeg = Object.prototype.hasOwnProperty.call(forcedAngles, symbol.key)
+      ? forcedAngles[symbol.key]
+      : fallbackAngle * 180 / Math.PI;
 
     return {
       symbol,
-      radiusX: Math.abs(dx) < 0.5 ? Math.max(9.5, Math.abs(dy)) : Math.hypot(dx, dy),
-      radiusY: Math.abs(dx) < 0.5 ? Math.max(17.0, Math.abs(dy)) : Math.hypot(dx, dy) * 0.72,
-      angle: Math.atan2(dy / 0.72, dx)
+      angle: angleDeg * Math.PI / 180
     };
   });
 
@@ -137,9 +158,9 @@ function orbitSymbols(symbols, duration, token) {
         ? 2 * t * t
         : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
-      const rotation = eased * Math.PI * 2; // clockwise, one full turn
+      const rotation = eased * Math.PI * 2;
 
-      orbitData.forEach(({ symbol, radiusX, radiusY, angle }) => {
+      orbitData.forEach(({ symbol, angle }) => {
         const a = angle + rotation;
         const x = center.x + Math.cos(a) * radiusX;
         const y = center.y + Math.sin(a) * radiusY;
@@ -327,57 +348,74 @@ async function playClip01() {
     })
   ];
 
-  // 1) Goat appears first.
+  // 1) Bock erscheint zuerst.
   await fadeInSymbol(goat, 720);
   if (token !== clip01RunToken) return;
 
-  // 2) All other symbols appear together.
+  // NEU: Bock steht exakt 2 Sekunden alleine.
+  if (!(await waitClip01(2000, token))) return;
+
+  // 2) Alle anderen Symbole erscheinen gemeinsam.
   await Promise.all(orbiters.map((symbol) => fadeInSymbol(symbol, 520)));
   if (token !== clip01RunToken) return;
 
   if (!(await waitClip01(260, token))) return;
 
-  // 3) One complete clockwise orbit around the goat.
+  // 3) Eine komplette Kreisfahrt im Uhrzeigersinn.
+  // Die beiden Helme bleiben dabei bewusst getrennt.
   const orbitDone = await orbitSymbols(orbiters, 2300, token);
   if (!orbitDone || token !== clip01RunToken) return;
 
   if (!(await waitClip01(180, token))) return;
 
-  // 4) All orbiters leave at the same moment and arrive together.
+  // 4) Alle Außensymbole fahren gleichzeitig an ihre Stammposition.
   const travelDuration = 1750;
-  await Promise.all(orbiters.map((symbol) => animateToTarget(symbol, travelDuration)));
+  await Promise.all(
+    orbiters.map((symbol) => animateToTarget(symbol, travelDuration))
+  );
   if (token !== clip01RunToken) return;
 
-  // 5) Exact arrival: dark/grey puffs, symbols vanish.
-  orbiters.forEach((symbol) => {
-    puffAt(symbol.target.x, symbol.target.y, "dark");
-    symbol.el.style.opacity = "0";
-  });
+  // NEU: Außensymbole bleiben dort sichtbar stehen.
+  if (!(await waitClip01(260, token))) return;
 
-  // Under the smoke: swap to attachment 2 (gold final peripheral symbols).
-  await crossfadeBackground("assets/clip01/frame-stage2.png", token);
-  if (token !== clip01RunToken) return;
-
-  orbiters.forEach((symbol) => symbol.el.remove());
-
-  if (!(await waitClip01(420, token))) return;
-
-  // 6) Goat alone moves to top centre.
+  // 5) Bock fährt jetzt allein nach oben.
   await animateToTarget(goat, 1350);
   if (token !== clip01RunToken) return;
 
-  // 7) Gold puff on arrival, goat fades; under the puff switch to attachment 3
-  // (existing assets/clip-frame.png with the golden goat in its final position).
+  // 6) Sobald der Bock angekommen ist, verpuffen ALLE gleichzeitig.
+  orbiters.forEach((symbol) => {
+    puffAt(symbol.target.x, symbol.target.y, "dark");
+
+    symbol.el.animate(
+      [{ opacity: 1 }, { opacity: 0 }],
+      {
+        duration: 180,
+        easing: "ease-out",
+        fill: "forwards"
+      }
+    );
+  });
+
   puffAt(goat.target.x, goat.target.y, "gold");
 
   goat.el.animate(
     [{ opacity: 1 }, { opacity: 0 }],
-    { duration: 180, easing: "ease-out", fill: "forwards" }
+    {
+      duration: 180,
+      easing: "ease-out",
+      fill: "forwards"
+    }
   );
 
+  /*
+    Zwischenbild entfällt komplett.
+    Während die Puffs den Bildschirm kaschieren, wechseln wir direkt
+    vom Startbild auf das endgültige Goldrahmen-Bild.
+  */
   await crossfadeBackground("assets/clip-frame.png", token);
   if (token !== clip01RunToken) return;
 
+  orbiters.forEach((symbol) => symbol.el.remove());
   goat.el.remove();
 }
 
