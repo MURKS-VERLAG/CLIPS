@@ -6,6 +6,41 @@ let clip01RunToken = 0;
 let clip01Raf = null;
 const clip01Timers = new Set();
 
+const clip01Sounds = {
+  impact: new Audio("assets/clip01/sound-impact.mp3"),
+  orbit: new Audio("assets/clip01/sound-orbit.mp3"),
+  travel: new Audio("assets/clip01/sound-travel.mp3")
+};
+
+Object.values(clip01Sounds).forEach((audio) => {
+  audio.preload = "auto";
+  audio.volume = 1;
+});
+
+function playClip01Sound(name) {
+  const audio = clip01Sounds[name];
+  if (!audio) return;
+
+  try {
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 1;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  } catch (_) {}
+}
+
+function stopClip01Sounds() {
+  Object.values(clip01Sounds).forEach((audio) => {
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+    } catch (_) {}
+  });
+}
+
 const vault = document.getElementById("vault");
 const clipGrid = document.getElementById("clipGrid");
 const pageLabel = document.getElementById("pageLabel");
@@ -48,6 +83,7 @@ function waitClip01(ms, token) {
 
 function stopClip01Animation() {
   clip01RunToken += 1;
+  stopClip01Sounds();
 
   if (clip01Raf) {
     cancelAnimationFrame(clip01Raf);
@@ -225,6 +261,37 @@ function puffAt(x, y, type = "dark") {
   setTimeout(() => puff.remove(), 2550);
 }
 
+function borderPuff() {
+  const layer = getClip01Layer();
+  if (!layer) return;
+
+  const puff = document.createElement("div");
+  puff.className = "clip01-border-puff";
+  layer.appendChild(puff);
+
+  requestAnimationFrame(() => {
+    puff.classList.add("is-active");
+  });
+
+  setTimeout(() => puff.remove(), 1250);
+}
+
+function impactShake() {
+  const stage = getClipStage();
+  if (!stage) return;
+
+  stage.classList.remove("is-impacting");
+  void stage.offsetWidth;
+  stage.classList.add("is-impacting");
+
+  const timer = setTimeout(() => {
+    clip01Timers.delete(timer);
+    stage.classList.remove("is-impacting");
+  }, 430);
+
+  clip01Timers.add(timer);
+}
+
 async function crossfadeBackground(src, token) {
   const current = getClipStageBackground();
   const next = getClipStageBackgroundNext();
@@ -357,12 +424,14 @@ async function playClip01() {
 
   // 3) Eine komplette Kreisfahrt im Uhrzeigersinn.
   // Die beiden Helme bleiben dabei bewusst getrennt.
+  playClip01Sound("orbit");
   const orbitDone = await orbitSymbols(orbiters, 2300, token);
   if (!orbitDone || token !== clip01RunToken) return;
 
   if (!(await waitClip01(180, token))) return;
 
   // 4) Alle Außensymbole fahren gleichzeitig an ihre Stammposition.
+  playClip01Sound("travel");
   const travelDuration = 1750;
   await Promise.all(
     orbiters.map((symbol) => animateToTarget(symbol, travelDuration))
@@ -377,6 +446,11 @@ async function playClip01() {
   if (token !== clip01RunToken) return;
 
   // 6) Sobald der Bock angekommen ist, verpuffen ALLE gleichzeitig.
+  // Impact: Sound + kurzer Einschlag-Ruckler + leichter dunkler Puff am Goldrand.
+  playClip01Sound("impact");
+  impactShake();
+  borderPuff();
+
   orbiters.forEach((symbol) => {
     puffAt(symbol.target.x, symbol.target.y, "dark");
 
