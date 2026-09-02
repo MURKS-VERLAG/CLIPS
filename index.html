@@ -384,8 +384,8 @@
       width: 200vmax;
       height: 200vmax;
       transition:
-        width 760ms cubic-bezier(.58,.02,.42,.98),
-        height 760ms cubic-bezier(.58,.02,.42,.98);
+        width 1150ms cubic-bezier(.58,.02,.42,.98),
+        height 1150ms cubic-bezier(.58,.02,.42,.98);
     }
 
     .clip03-iris--closing.is-active {
@@ -393,17 +393,21 @@
       height: 0;
     }
 
-    .clip03-iris--opening {
-      width: 0;
-      height: 0;
-      transition:
-        width 900ms cubic-bezier(.2,.72,.25,1),
-        height 900ms cubic-bezier(.2,.72,.25,1);
+    /* Clip 03 AUSBLENDE: keine Iris mehr. Das komplett schwarze Bild
+       fadet als ganze Fläche weich weg und gibt die neue Szene frei. */
+    .clip03-fade-out {
+      position: absolute;
+      inset: 0;
+      z-index: 100;
+      background: #000;
+      opacity: 1;
+      pointer-events: none;
+      transition: opacity 1050ms cubic-bezier(.2,.72,.25,1);
+      will-change: opacity;
     }
 
-    .clip03-iris--opening.is-active {
-      width: 200vmax;
-      height: 200vmax;
+    .clip03-fade-out.is-active {
+      opacity: 0;
     }
 
   </style>
@@ -457,6 +461,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-sequence-01"></script>
+  <script src="app.js?v=clip03-sequence-02"></script>
 </body>
 </html>

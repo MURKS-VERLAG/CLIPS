@@ -413,24 +413,29 @@ async function playClip03() {
 
   iris.classList.add("is-active");
 
-  if (!(await waitClip03(760, token))) return;
+  if (!(await waitClip03(1150, token))) return;
 
   // 3) Im komplett schwarzen Moment wird ausschließlich der Inhalt darunter ersetzt.
   buildClip03FinalScene();
 
   if (!(await waitClip03(100, token))) return;
 
-  // 4) Gleiche Iris rückwärts: Mitte öffnet sich und gibt das neue Bild nach außen frei.
-  iris.classList.remove("clip03-iris--closing");
-  iris.classList.add("clip03-iris--opening");
-
-  // Force style reset before opening.
-  void iris.offsetWidth;
-  iris.classList.add("is-active");
-
-  if (!(await waitClip03(900, token))) return;
-
+  // 4) AUSBLENDE: keine rückwärts laufende Iris mehr.
+  // Das Schwarz fadet als komplette Fläche weich weg und gibt die neue Szene frei.
   iris.remove();
+
+  const fadeOut = document.createElement("div");
+  fadeOut.className = "clip03-fade-out";
+  layer.appendChild(fadeOut);
+
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (token !== clip03RunToken) return;
+
+  fadeOut.classList.add("is-active");
+
+  if (!(await waitClip03(1050, token))) return;
+
+  fadeOut.remove();
 
   // Szene bleibt anschließend unverändert stehen.
 }
