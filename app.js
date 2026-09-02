@@ -89,7 +89,8 @@ const clip02Images = [
   "assets/clip02/12-allerheiligen.webp",
   "assets/clip02/13-siegel-kelch.webp",
   "assets/clip02/14-steinfigur.webp",
-  "assets/clip02/15-steinkreuz.webp"
+  "assets/clip02/15-steinkreuz.webp",
+  "assets/clip02/16-schreibtisch-final.webp"
 ];
 
 const clip02CueTimes = clip02Images.map((_, index) => index === 0 ? 1 : 1.25 + index * 4);
@@ -161,7 +162,28 @@ function showClip02TimedImage(src, token) {
 
 function showClip02FinalImage(src, token) {
   if (token !== clip02RunToken) return;
-  createClip02Image(src, true);
+
+  const img = createClip02Image(src, true);
+  if (!img) return;
+
+  const safeZone = img.closest(".clip02-safe-zone");
+  if (!safeZone) return;
+
+  const smoke = document.createElement("div");
+  smoke.className = "clip02-cigarette-smoke";
+
+  for (let index = 0; index < 6; index += 1) {
+    const wisp = document.createElement("span");
+    wisp.className = "clip02-cigarette-smoke__wisp";
+    wisp.style.setProperty("--smoke-index", String(index));
+    smoke.appendChild(wisp);
+  }
+
+  safeZone.appendChild(smoke);
+
+  requestAnimationFrame(() => {
+    smoke.classList.add("is-active");
+  });
 }
 
 async function playClip02() {
@@ -216,7 +238,7 @@ async function playClip02() {
     } else {
       clip02Raf = null;
 
-      // Letztes Bild bleibt bis exakt zum Songende stehen und fadet dann sauber aus.
+      // Neues Schreibtisch-Endbild bleibt bis exakt zum Songende stehen und fadet dann sauber aus.
       const finalImg = layer.querySelector(".clip02-image--final");
       if (finalImg) {
         finalImg.classList.add("is-ending");

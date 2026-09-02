@@ -249,6 +249,85 @@
       0%   { opacity: 1; transform: scale(1); }
       100% { opacity: 0; transform: scale(.99); }
     }
+
+    /* CLIP 02 ENDBILD: dichter Zigarettenqualm direkt über dem Aschenbecher. */
+    .clip02-cigarette-smoke {
+      position: absolute;
+      left: 50%;
+      top: 79%;
+      width: clamp(120px, 13vw, 250px);
+      height: clamp(190px, 27vh, 360px);
+      transform: translate(-50%, -100%);
+      z-index: 4;
+      opacity: 0;
+      pointer-events: none;
+      filter: blur(1px);
+      overflow: visible;
+    }
+
+    .clip02-cigarette-smoke.is-active {
+      opacity: 1;
+      transition: opacity 520ms ease-out;
+    }
+
+    .clip02-cigarette-smoke__wisp {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 44%;
+      height: 52%;
+      border-radius: 50%;
+      opacity: 0;
+      transform: translateX(-50%) scale(.55);
+      background:
+        radial-gradient(ellipse at 50% 78%,
+          rgba(235,235,235,.66) 0 14%,
+          rgba(190,190,190,.48) 28%,
+          rgba(120,120,120,.26) 49%,
+          transparent 72%);
+      filter: blur(7px);
+      mix-blend-mode: screen;
+      animation: clip02SmokeRise 4.8s ease-in-out infinite;
+      animation-delay: calc(var(--smoke-index) * -0.72s);
+      will-change: transform, opacity;
+    }
+
+    .clip02-cigarette-smoke__wisp:nth-child(2n) {
+      left: 43%;
+      width: 52%;
+      height: 58%;
+      filter: blur(9px);
+    }
+
+    .clip02-cigarette-smoke__wisp:nth-child(3n) {
+      left: 57%;
+      width: 58%;
+      height: 62%;
+      filter: blur(11px);
+    }
+
+    @keyframes clip02SmokeRise {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 10%) scale(.48) rotate(-4deg);
+      }
+      14% {
+        opacity: .72;
+      }
+      38% {
+        opacity: .62;
+        transform: translate(-58%, -46%) scale(.9) rotate(5deg);
+      }
+      66% {
+        opacity: .42;
+        transform: translate(-39%, -105%) scale(1.28) rotate(-6deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-62%, -175%) scale(1.72) rotate(8deg);
+      }
+    }
+
   </style>
 </head>
 
@@ -299,6 +378,6 @@
     <div id="clip02AnimationLayer" class="clip02-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip02-sequence-03"></script>
+  <script src="app.js?v=clip02-sequence-04"></script>
 </body>
 </html>
