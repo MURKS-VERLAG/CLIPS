@@ -236,10 +236,10 @@ async function playClip02() {
 
 function getFrameForClip(clipNumber) {
   if (clipNumber >= 21 && clipNumber <= 40) {
-    return "assets/clip-frame-grid.webp";
+    return "assets/clip-frame-grid.png";
   }
 
-  return "assets/clip-frame.webp";
+  return "assets/clip-frame.png";
 }
 
 function waitClip01(ms, token) {
@@ -505,14 +505,14 @@ async function playClip01() {
 
   if (!current || !next || !layer) return;
 
-  current.src = "assets/clip01/frame-clean.webp";
+  current.src = "assets/clip01/frame-clean.png";
   next.style.opacity = "0";
   next.src = "";
   layer.innerHTML = "";
 
   const goat = createClip01Symbol({
     key: "goat",
-    src: "assets/clip01/goat.webp",
+    src: "assets/clip01/goat.png",
     width: "12.2vw",
     start: { x: 50.0, y: 49.4 },
     target: { x: 50.0, y: 10.2 },
@@ -522,7 +522,7 @@ async function playClip01() {
   const orbiters = [
     createClip01Symbol({
       key: "helmet-left",
-      src: "assets/clip01/helmet.webp",
+      src: "assets/clip01/helmet.png",
       width: "7.0vw",
       start: { x: 47.2, y: 34.5 },
       target: { x: 4.6, y: 8.1 },
@@ -530,7 +530,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "helmet-right",
-      src: "assets/clip01/helmet.webp",
+      src: "assets/clip01/helmet.png",
       width: "7.0vw",
       mirrored: true,
       start: { x: 52.7, y: 34.5 },
@@ -539,7 +539,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "sword-left",
-      src: "assets/clip01/sword.webp",
+      src: "assets/clip01/sword.png",
       width: "10.2vw",
       start: { x: 29.8, y: 49.8 },
       target: { x: 4.3, y: 50.2 },
@@ -547,7 +547,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "sword-right",
-      src: "assets/clip01/sword.webp",
+      src: "assets/clip01/sword.png",
       width: "10.2vw",
       start: { x: 71.1, y: 49.8 },
       target: { x: 95.3, y: 50.2 },
@@ -555,7 +555,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "cup",
-      src: "assets/clip01/cup.webp",
+      src: "assets/clip01/cup.png",
       width: "8.7vw",
       start: { x: 37.3, y: 49.3 },
       target: { x: 5.2, y: 91.6 },
@@ -563,7 +563,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "wheel",
-      src: "assets/clip01/wheel.webp",
+      src: "assets/clip01/wheel.png",
       width: "8.5vw",
       start: { x: 63.3, y: 49.3 },
       target: { x: 94.4, y: 91.4 },
@@ -571,7 +571,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "bottom-shield",
-      src: "assets/clip01/bottom-shield.webp",
+      src: "assets/clip01/bottom-shield.png",
       width: "9.3vw",
       start: { x: 50.0, y: 67.1 },
       target: { x: 50.0, y: 92.2 },
@@ -651,7 +651,7 @@ async function playClip01() {
     Während die Puffs den Bildschirm kaschieren, wechseln wir direkt
     vom Startbild auf das endgültige Goldrahmen-Bild.
   */
-  await crossfadeBackground("assets/clip-frame.webp", token);
+  await crossfadeBackground("assets/clip-frame.png", token);
   if (token !== clip01RunToken) return;
 
   orbiters.forEach((symbol) => symbol.el.remove());
@@ -674,7 +674,7 @@ function openClip(clipNumber) {
   clipStage.dataset.activeClip = String(clipNumber);
 
   if (clipNumber === 1) {
-    clipStageBackground.src = "assets/clip01/frame-clean.webp";
+    clipStageBackground.src = "assets/clip01/frame-clean.png";
   } else if (clipNumber === 2) {
     // Clip 02: ursprünglicher Goldrahmen bleibt permanent als Hintergrund sichtbar.
     clipStageBackground.src = "assets/clip-frame.png";
