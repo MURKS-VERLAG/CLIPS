@@ -16,6 +16,18 @@ const clip03Soundtrack = new Audio("assets/clip03/lumen-in-tenebris.mp3");
 clip03Soundtrack.preload = "auto";
 clip03Soundtrack.volume = 1;
 
+const clip03WomanRest = "assets/clip03/woman-rest.webp";
+const clip03WomanSingImages = [
+  "assets/clip03/woman-sing-01.webp",
+  "assets/clip03/woman-sing-02.webp",
+  "assets/clip03/woman-sing-03.webp",
+  "assets/clip03/woman-sing-04.webp",
+  "assets/clip03/woman-sing-05.webp",
+  "assets/clip03/woman-sing-06.webp",
+  "assets/clip03/woman-sing-07.webp",
+  "assets/clip03/woman-sing-08.webp"
+];
+
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
 clip02Soundtrack.volume = 1;
@@ -391,19 +403,93 @@ function buildClip03FinalScene(container) {
   });
 }
 
-function showClip03Woman(layer, token) {
-  if (!layer || token !== clip03RunToken) return;
+function getClip03Woman(layer) {
+  if (!layer) return null;
 
-  const woman = document.createElement("img");
+  let woman = layer.querySelector(".clip03-woman");
+  if (woman) return woman;
+
+  woman = document.createElement("img");
   woman.className = "clip03-woman";
-  woman.src = "assets/clip03/woman.webp";
   woman.alt = "";
   woman.draggable = false;
   layer.appendChild(woman);
+  return woman;
+}
 
-  requestAnimationFrame(() => {
-    if (token === clip03RunToken) woman.classList.add("is-active");
-  });
+function setClip03WomanImage(layer, src) {
+  const woman = getClip03Woman(layer);
+  if (!woman) return null;
+  woman.src = src;
+  return woman;
+}
+
+function showClip03Woman(layer, src, fadeIn = false) {
+  const woman = setClip03WomanImage(layer, src);
+  if (!woman) return null;
+
+  woman.classList.remove("is-fading-out");
+
+  if (fadeIn) {
+    woman.classList.remove("is-visible");
+    void woman.offsetWidth;
+    requestAnimationFrame(() => woman.classList.add("is-visible"));
+  } else {
+    woman.classList.add("is-visible");
+  }
+
+  return woman;
+}
+
+function hideClip03Woman(layer) {
+  const woman = layer?.querySelector(".clip03-woman");
+  if (!woman) return;
+  woman.classList.add("is-fading-out");
+  woman.classList.remove("is-visible");
+}
+
+function createClip03ShuffleBag(previousSrc = null) {
+  const bag = [...clip03WomanSingImages];
+
+  for (let i = bag.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+
+  // Auch über die Grenze zweier Durchläufe hinweg kein direktes Doppelbild.
+  if (bag.length > 1 && bag[0] === previousSrc) {
+    [bag[0], bag[1]] = [bag[1], bag[0]];
+  }
+
+  return bag;
+}
+
+function startClip03Singing(layer, token, isAllowed) {
+  let bag = [];
+  let previousSrc = null;
+
+  const nextFrame = () => {
+    if (token !== clip03RunToken || !isAllowed()) return;
+
+    if (bag.length === 0) {
+      bag = createClip03ShuffleBag(previousSrc);
+    }
+
+    const src = bag.shift();
+    previousSrc = src;
+
+    // Harter Bildwechsel alle 0,3 Sekunden: bewusst KEIN Crossfade.
+    showClip03Woman(layer, src, false);
+
+    const timer = setTimeout(() => {
+      clip03Timers.delete(timer);
+      nextFrame();
+    }, 300);
+
+    clip03Timers.add(timer);
+  };
+
+  nextFrame();
 }
 
 async function playClip03() {
@@ -416,32 +502,27 @@ async function playClip03() {
 
   if (!current || !next || !layer) return;
 
-  // 1) Eine Sekunde lang exakt der normale hinterlegte Standardrahmen.
-  current.src = "assets/clip-frame.png";
+  // Clip 03 startet DIREKT mit Hintergrund 2 / der fertigen Symbolszene.
+  // Kein Anfangs-Fade, keine Iris, keine Wartezeit.
+  current.src = "assets/clip01/frame-clean.png";
   current.style.opacity = "1";
   next.style.transition = "none";
   next.style.opacity = "0";
   next.src = "";
   layer.innerHTML = "";
 
-  if (!(await waitClip03(1000, token))) return;
-
-  // 2) Keine Iris mehr: die KOMPLETTE neue Szene liegt als zweite Ebene darüber
-  // und fadet als Ganzes weich ein.
   const scene = document.createElement("div");
-  scene.className = "clip03-final-scene";
+  scene.className = "clip03-final-scene is-active";
   buildClip03FinalScene(scene);
   layer.appendChild(scene);
 
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  if (token !== clip03RunToken) return;
+  // Alle Frauenbilder vorladen, damit die 0,3-s-Wechsel sauber bleiben.
+  [clip03WomanRest, ...clip03WomanSingImages].forEach((src) => {
+    const preload = new Image();
+    preload.src = src;
+  });
 
-  scene.classList.add("is-active");
-
-  if (!(await waitClip03(1300, token))) return;
-
-  // Der neue Hintergrund ist jetzt vollständig da.
-  // Ab exakt diesem Moment beginnt die Musik.
+  // Song startet sofort mit Clip 03.
   try {
     clip03Soundtrack.currentTime = 0;
     clip03Soundtrack.volume = 1;
@@ -452,26 +533,74 @@ async function playClip03() {
 
   if (token !== clip03RunToken) return;
 
-  // 3) Exakt bei Songsekunde 12 erscheint die Frau links,
-  // bewusst innerhalb der freien Bildfläche und ohne den Rahmen zu berühren.
-  const waitForWoman = () => {
+  let phase = "before12";
+  let singingRun = 0;
+
+  const tick = () => {
     if (token !== clip03RunToken) return;
 
-    if (clip03Soundtrack.currentTime >= 12) {
-      showClip03Woman(layer, token);
-      return;
+    const t = clip03Soundtrack.currentTime;
+
+    if (t >= 12 && t < 20 && phase !== "sing12") {
+      phase = "sing12";
+      singingRun += 1;
+      const run = singingRun;
+      showClip03Woman(layer, clip03WomanSingImages[0], true);
+      startClip03Singing(layer, token, () =>
+        token === clip03RunToken &&
+        phase === "sing12" &&
+        singingRun === run &&
+        clip03Soundtrack.currentTime < 20
+      );
+    }
+
+    if (t >= 20 && t < 22 && phase !== "rest20") {
+      phase = "rest20";
+      singingRun += 1;
+      showClip03Woman(layer, clip03WomanRest, false);
+    }
+
+    if (t >= 22 && t < 43 && phase !== "hidden22") {
+      phase = "hidden22";
+      singingRun += 1;
+      hideClip03Woman(layer);
+    }
+
+    if (t >= 43 && t < 45 && phase !== "rest43") {
+      phase = "rest43";
+      singingRun += 1;
+      showClip03Woman(layer, clip03WomanRest, true);
+    }
+
+    if (t >= 45 && t < 80 && phase !== "sing45") {
+      phase = "sing45";
+      singingRun += 1;
+      const run = singingRun;
+      showClip03Woman(layer, clip03WomanSingImages[0], false);
+      startClip03Singing(layer, token, () =>
+        token === clip03RunToken &&
+        phase === "sing45" &&
+        singingRun === run &&
+        clip03Soundtrack.currentTime < 80
+      );
+    }
+
+    if (t >= 80 && phase !== "rest80") {
+      phase = "rest80";
+      singingRun += 1;
+      showClip03Woman(layer, clip03WomanRest, false);
     }
 
     if (!clip03Soundtrack.ended) {
       const timer = setTimeout(() => {
         clip03Timers.delete(timer);
-        waitForWoman();
-      }, 30);
+        tick();
+      }, 25);
       clip03Timers.add(timer);
     }
   };
 
-  waitForWoman();
+  tick();
 }
 
 function getFrameForClip(clipNumber) {
