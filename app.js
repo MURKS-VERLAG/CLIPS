@@ -225,6 +225,68 @@ function puffAt(x, y, type = "dark") {
   setTimeout(() => puff.remove(), 1450);
 }
 
+async function smokeSwapBackground(src, token) {
+  const current = getClipStageBackground();
+  const layer = getClip01Layer();
+
+  if (!current || !layer || token !== clip01RunToken) return false;
+
+  const veil = document.createElement("div");
+  veil.className = "clip01-smoke-veil";
+
+  const darkSmoke = document.createElement("div");
+  darkSmoke.className = "clip01-smoke-veil__dark";
+
+  const goldSmoke = document.createElement("div");
+  goldSmoke.className = "clip01-smoke-veil__gold";
+
+  veil.appendChild(darkSmoke);
+  veil.appendChild(goldSmoke);
+  layer.appendChild(veil);
+
+  // Preload final background before the visual cut.
+  const preload = new Image();
+  preload.src = src;
+
+  try {
+    await preload.decode();
+  } catch (_) {}
+
+  if (token !== clip01RunToken) {
+    veil.remove();
+    return false;
+  }
+
+  requestAnimationFrame(() => {
+    veil.classList.add("is-active");
+  });
+
+  // Smoke grows fast and covers the old frame.
+  if (!(await waitClip01(210, token))) {
+    veil.remove();
+    return false;
+  }
+
+  // Hidden hard cut underneath maximum smoke density.
+  current.src = src;
+
+  // Let the new image settle while existing individual puffs remain visible.
+  if (!(await waitClip01(520, token))) {
+    veil.remove();
+    return false;
+  }
+
+  veil.classList.add("is-clearing");
+
+  if (!(await waitClip01(620, token))) {
+    veil.remove();
+    return false;
+  }
+
+  veil.remove();
+  return true;
+}
+
 async function crossfadeBackground(src, token) {
   const current = getClipStageBackground();
   const next = getClipStageBackgroundNext();
@@ -406,7 +468,7 @@ async function playClip01() {
     Während die Puffs den Bildschirm kaschieren, wechseln wir direkt
     vom Startbild auf das endgültige Goldrahmen-Bild.
   */
-  await crossfadeBackground("assets/clip-frame.png", token);
+  await smokeSwapBackground("assets/clip-frame.png", token);
   if (token !== clip01RunToken) return;
 
   orbiters.forEach((symbol) => symbol.el.remove());
