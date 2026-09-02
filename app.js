@@ -6,6 +6,13 @@ let clip01RunToken = 0;
 let clip01Raf = null;
 const clip01Timers = new Set();
 
+let clip02RunToken = 0;
+let clip02Raf = null;
+const clip02Timers = new Set();
+const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
+clip02Soundtrack.preload = "auto";
+clip02Soundtrack.volume = 1;
+
 const clip01Sounds = {
   impact: new Audio("assets/clip01/sound-impact.mp3"),
   orbit: new Audio("assets/clip01/sound-orbit.mp3"),
@@ -63,12 +70,176 @@ function getClip01Layer() {
   return document.getElementById("clip01AnimationLayer");
 }
 
-function getFrameForClip(clipNumber) {
-  if (clipNumber >= 21 && clipNumber <= 40) {
-    return "assets/clip-frame-grid.png";
+function getClip02Layer() {
+  return document.getElementById("clip02AnimationLayer");
+}
+
+const clip02Images = [
+  "assets/clip02/01-murks.webp",
+  "assets/clip02/02-firefly.webp",
+  "assets/clip02/03-sagen-renchtal.webp",
+  "assets/clip02/04-archivkarte.webp",
+  "assets/clip02/05-lautenbach.webp",
+  "assets/clip02/06-waldplatz.webp",
+  "assets/clip02/07-burgruine.webp",
+  "assets/clip02/08-sagen-schwarzwald.webp",
+  "assets/clip02/09-urkunde.webp",
+  "assets/clip02/10-baerenbach-seite.webp",
+  "assets/clip02/11-siegel-wedel.webp",
+  "assets/clip02/12-allerheiligen.webp",
+  "assets/clip02/13-siegel-kelch.webp",
+  "assets/clip02/14-steinfigur.webp",
+  "assets/clip02/15-steinkreuz.webp"
+];
+
+const clip02CueTimes = clip02Images.map((_, index) => 1 + index * 4);
+
+function clearClip02Timers() {
+  clip02Timers.forEach((timer) => clearTimeout(timer));
+  clip02Timers.clear();
+}
+
+function stopClip02Animation() {
+  clip02RunToken += 1;
+
+  if (clip02Raf) {
+    cancelAnimationFrame(clip02Raf);
+    clip02Raf = null;
   }
 
-  return "assets/clip-frame.png";
+  clearClip02Timers();
+
+  try {
+    clip02Soundtrack.pause();
+    clip02Soundtrack.currentTime = 0;
+  } catch (_) {}
+
+  const layer = getClip02Layer();
+  if (layer) layer.innerHTML = "";
+}
+
+function createClip02Image(src, isFinal = false) {
+  const layer = getClip02Layer();
+  if (!layer) return null;
+
+  layer.innerHTML = "";
+
+  const safeZone = document.createElement("div");
+  safeZone.className = "clip02-safe-zone";
+
+  const img = document.createElement("img");
+  img.className = `clip02-image${isFinal ? " clip02-image--final" : ""}`;
+  img.src = src;
+  img.alt = "";
+  img.draggable = false;
+
+  safeZone.appendChild(img);
+  layer.appendChild(safeZone);
+
+  requestAnimationFrame(() => {
+    img.classList.add("is-active");
+  });
+
+  return img;
+}
+
+function showClip02TimedImage(src, token) {
+  if (token !== clip02RunToken) return;
+
+  const img = createClip02Image(src, false);
+  if (!img) return;
+
+  const timer = setTimeout(() => {
+    clip02Timers.delete(timer);
+    if (token !== clip02RunToken) return;
+    const layer = getClip02Layer();
+    if (layer) layer.innerHTML = "";
+  }, 1100);
+
+  clip02Timers.add(timer);
+}
+
+function showClip02FinalImage(src, token) {
+  if (token !== clip02RunToken) return;
+  createClip02Image(src, true);
+}
+
+async function playClip02() {
+  stopClip02Animation();
+  const token = clip02RunToken;
+  const layer = getClip02Layer();
+
+  if (!layer) return;
+
+  layer.innerHTML = "";
+
+  // Preload all sequence images without changing the visible frame.
+  clip02Images.forEach((src) => {
+    const preload = new Image();
+    preload.src = src;
+  });
+
+  try {
+    clip02Soundtrack.currentTime = 0;
+    clip02Soundtrack.volume = 1;
+    await clip02Soundtrack.play();
+  } catch (_) {
+    return;
+  }
+
+  if (token !== clip02RunToken) return;
+
+  let nextCueIndex = 0;
+
+  const tick = () => {
+    if (token !== clip02RunToken) return;
+
+    const currentTime = clip02Soundtrack.currentTime;
+
+    while (
+      nextCueIndex < clip02CueTimes.length &&
+      currentTime >= clip02CueTimes[nextCueIndex]
+    ) {
+      const isFinal = nextCueIndex === clip02Images.length - 1;
+
+      if (isFinal) {
+        showClip02FinalImage(clip02Images[nextCueIndex], token);
+      } else {
+        showClip02TimedImage(clip02Images[nextCueIndex], token);
+      }
+
+      nextCueIndex += 1;
+    }
+
+    if (!clip02Soundtrack.ended) {
+      clip02Raf = requestAnimationFrame(tick);
+    } else {
+      clip02Raf = null;
+
+      // Letztes Bild bleibt bis exakt zum Songende stehen und fadet dann sauber aus.
+      const finalImg = layer.querySelector(".clip02-image--final");
+      if (finalImg) {
+        finalImg.classList.add("is-ending");
+
+        const timer = setTimeout(() => {
+          clip02Timers.delete(timer);
+          if (token === clip02RunToken) layer.innerHTML = "";
+        }, 520);
+
+        clip02Timers.add(timer);
+      }
+    }
+  };
+
+  clip02Raf = requestAnimationFrame(tick);
+}
+
+function getFrameForClip(clipNumber) {
+  if (clipNumber >= 21 && clipNumber <= 40) {
+    return "assets/clip-frame-grid.webp";
+  }
+
+  return "assets/clip-frame.webp";
 }
 
 function waitClip01(ms, token) {
@@ -334,14 +505,14 @@ async function playClip01() {
 
   if (!current || !next || !layer) return;
 
-  current.src = "assets/clip01/frame-clean.png";
+  current.src = "assets/clip01/frame-clean.webp";
   next.style.opacity = "0";
   next.src = "";
   layer.innerHTML = "";
 
   const goat = createClip01Symbol({
     key: "goat",
-    src: "assets/clip01/goat.png",
+    src: "assets/clip01/goat.webp",
     width: "12.2vw",
     start: { x: 50.0, y: 49.4 },
     target: { x: 50.0, y: 10.2 },
@@ -351,7 +522,7 @@ async function playClip01() {
   const orbiters = [
     createClip01Symbol({
       key: "helmet-left",
-      src: "assets/clip01/helmet.png",
+      src: "assets/clip01/helmet.webp",
       width: "7.0vw",
       start: { x: 47.2, y: 34.5 },
       target: { x: 4.6, y: 8.1 },
@@ -359,7 +530,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "helmet-right",
-      src: "assets/clip01/helmet.png",
+      src: "assets/clip01/helmet.webp",
       width: "7.0vw",
       mirrored: true,
       start: { x: 52.7, y: 34.5 },
@@ -368,7 +539,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "sword-left",
-      src: "assets/clip01/sword.png",
+      src: "assets/clip01/sword.webp",
       width: "10.2vw",
       start: { x: 29.8, y: 49.8 },
       target: { x: 4.3, y: 50.2 },
@@ -376,7 +547,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "sword-right",
-      src: "assets/clip01/sword.png",
+      src: "assets/clip01/sword.webp",
       width: "10.2vw",
       start: { x: 71.1, y: 49.8 },
       target: { x: 95.3, y: 50.2 },
@@ -384,7 +555,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "cup",
-      src: "assets/clip01/cup.png",
+      src: "assets/clip01/cup.webp",
       width: "8.7vw",
       start: { x: 37.3, y: 49.3 },
       target: { x: 5.2, y: 91.6 },
@@ -392,7 +563,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "wheel",
-      src: "assets/clip01/wheel.png",
+      src: "assets/clip01/wheel.webp",
       width: "8.5vw",
       start: { x: 63.3, y: 49.3 },
       target: { x: 94.4, y: 91.4 },
@@ -400,7 +571,7 @@ async function playClip01() {
     }),
     createClip01Symbol({
       key: "bottom-shield",
-      src: "assets/clip01/bottom-shield.png",
+      src: "assets/clip01/bottom-shield.webp",
       width: "9.3vw",
       start: { x: 50.0, y: 67.1 },
       target: { x: 50.0, y: 92.2 },
@@ -480,7 +651,7 @@ async function playClip01() {
     Während die Puffs den Bildschirm kaschieren, wechseln wir direkt
     vom Startbild auf das endgültige Goldrahmen-Bild.
   */
-  await crossfadeBackground("assets/clip-frame.png", token);
+  await crossfadeBackground("assets/clip-frame.webp", token);
   if (token !== clip01RunToken) return;
 
   orbiters.forEach((symbol) => symbol.el.remove());
@@ -498,11 +669,12 @@ function openClip(clipNumber) {
   }
 
   stopClip01Animation();
+  stopClip02Animation();
 
   clipStage.dataset.activeClip = String(clipNumber);
 
   if (clipNumber === 1) {
-    clipStageBackground.src = "assets/clip01/frame-clean.png";
+    clipStageBackground.src = "assets/clip01/frame-clean.webp";
   } else {
     clipStageBackground.src = getFrameForClip(clipNumber);
   }
@@ -516,6 +688,8 @@ function openClip(clipNumber) {
 
   if (clipNumber === 1) {
     requestAnimationFrame(() => playClip01());
+  } else if (clipNumber === 2) {
+    requestAnimationFrame(() => playClip02());
   }
 }
 
@@ -525,6 +699,7 @@ function closeClip() {
   if (!vault || !clipStage) return;
 
   stopClip01Animation();
+  stopClip02Animation();
 
   clipStage.hidden = true;
   clipStage.style.setProperty("display", "none", "important");
