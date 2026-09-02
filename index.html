@@ -72,13 +72,13 @@
     .clip01-puff {
       position: absolute;
       z-index: 20;
-      width: clamp(95px, 12vw, 230px);
+      width: clamp(125px, 15vw, 300px);
       aspect-ratio: 1;
       transform: translate(-50%, -50%) scale(.25);
       opacity: 0;
       pointer-events: none;
       border-radius: 50%;
-      filter: blur(1px);
+      filter: blur(1.4px);
     }
 
     .clip01-puff::before,
@@ -106,7 +106,7 @@
     .clip01-puff--gold {
       background:
         radial-gradient(circle at 50% 50%, rgba(255,225,111,.98) 0 19%, rgba(214,164,43,.88) 21% 40%, rgba(111,70,5,.72) 42% 58%, transparent 72%);
-      filter: blur(1px) drop-shadow(0 0 18px rgba(241,194,69,.62));
+      filter: blur(1.4px) drop-shadow(0 0 22px rgba(241,194,69,.68));
     }
 
     .clip01-puff--gold::before {
@@ -120,92 +120,17 @@
     }
 
     .clip01-puff.is-active {
-      animation: clip01Puff 1.25s ease-out forwards;
+      animation: clip01Puff 2.25s ease-out forwards;
     }
 
     @keyframes clip01Puff {
-      0%   { opacity: 0; transform: translate(-50%, -50%) scale(.16); }
-      14%  { opacity: 1; transform: translate(-50%, -50%) scale(.72); }
-      48%  { opacity: .98; transform: translate(-50%, -50%) scale(1.18); }
-      76%  { opacity: .72; transform: translate(-50%, -50%) scale(1.42); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.72); }
-    }
-
-    .clip01-smoke-veil {
-      position: absolute;
-      inset: 0;
-      z-index: 15;
-      opacity: 0;
-      pointer-events: none;
-      overflow: hidden;
-      transition:
-        opacity 220ms ease-out,
-        filter 520ms ease-out;
-      filter: blur(2px);
-    }
-
-    .clip01-smoke-veil__dark {
-      position: absolute;
-      inset: -14%;
-      transform: scale(.76);
-      opacity: 0;
-      background:
-        radial-gradient(circle at 8% 10%, rgba(42,42,42,.96) 0 8%, rgba(9,9,9,.96) 17%, transparent 30%),
-        radial-gradient(circle at 92% 10%, rgba(48,48,48,.96) 0 8%, rgba(7,7,7,.97) 17%, transparent 30%),
-        radial-gradient(circle at 7% 51%, rgba(55,55,55,.96) 0 10%, rgba(8,8,8,.98) 21%, transparent 37%),
-        radial-gradient(circle at 93% 51%, rgba(48,48,48,.96) 0 10%, rgba(7,7,7,.98) 21%, transparent 37%),
-        radial-gradient(circle at 8% 92%, rgba(50,50,50,.96) 0 10%, rgba(7,7,7,.98) 21%, transparent 36%),
-        radial-gradient(circle at 92% 92%, rgba(50,50,50,.96) 0 10%, rgba(7,7,7,.98) 21%, transparent 36%),
-        radial-gradient(ellipse at center, rgba(8,8,8,.92) 0 39%, rgba(12,12,12,.97) 58%, rgba(0,0,0,.99) 76%, transparent 88%);
-      transition:
-        opacity 210ms ease-out,
-        transform 520ms cubic-bezier(.2,.72,.22,1);
-    }
-
-    .clip01-smoke-veil__gold {
-      position: absolute;
-      left: 50%;
-      top: 10%;
-      width: clamp(230px, 24vw, 460px);
-      aspect-ratio: 1.35;
-      transform: translate(-50%, -50%) scale(.42);
-      opacity: 0;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 48% 53%, rgba(255,231,138,.98) 0 12%, rgba(232,181,54,.95) 25%, rgba(158,99,7,.72) 44%, rgba(74,43,0,.42) 58%, transparent 75%);
-      filter: blur(5px) drop-shadow(0 0 26px rgba(236,188,63,.7));
-      transition:
-        opacity 190ms ease-out,
-        transform 500ms cubic-bezier(.2,.72,.22,1);
-    }
-
-    .clip01-smoke-veil.is-active {
-      opacity: 1;
-    }
-
-    .clip01-smoke-veil.is-active .clip01-smoke-veil__dark {
-      opacity: 1;
-      transform: scale(1.08);
-    }
-
-    .clip01-smoke-veil.is-active .clip01-smoke-veil__gold {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.12);
-    }
-
-    .clip01-smoke-veil.is-clearing {
-      opacity: 0;
-      filter: blur(8px);
-    }
-
-    .clip01-smoke-veil.is-clearing .clip01-smoke-veil__dark {
-      opacity: 0;
-      transform: scale(1.22);
-    }
-
-    .clip01-smoke-veil.is-clearing .clip01-smoke-veil__gold {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(1.42);
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(.15); }
+      10%  { opacity: 1; transform: translate(-50%, -50%) scale(.70); }
+      34%  { opacity: .99; transform: translate(-50%, -50%) scale(1.15); }
+      58%  { opacity: .92; transform: translate(-50%, -50%) scale(1.42); }
+      76%  { opacity: .70; transform: translate(-50%, -50%) scale(1.62); }
+      90%  { opacity: .34; transform: translate(-50%, -50%) scale(1.78); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.92); }
     }
   </style>
 </head>
@@ -256,6 +181,6 @@
     <div id="clip01AnimationLayer" class="clip01-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip01-sequence-04"></script>
+  <script src="app.js?v=clip01-sequence-05"></script>
 </body>
 </html>
