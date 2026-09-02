@@ -329,7 +329,7 @@
     }
 
 
-    /* CLIP 03: statischer Clip-01-Zielzustand + klassische Irisblende. */
+    /* CLIP 03: kompletter Szenen-Crossfade, keine Iris mehr. */
     .clip03-animation-layer {
       position: absolute;
       inset: 0;
@@ -338,8 +338,36 @@
       pointer-events: none;
     }
 
+    .clip03-final-scene {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1300ms cubic-bezier(.22,.61,.36,1);
+      will-change: opacity;
+    }
+
+    .clip03-final-scene.is-active {
+      opacity: 1;
+    }
+
+    .clip03-scene-background {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      object-position: center center;
+      user-select: none;
+      pointer-events: none;
+    }
+
     .clip03-symbol {
       position: absolute;
+      z-index: 2;
       display: block;
       width: var(--clip03-symbol-width);
       height: auto;
@@ -360,54 +388,32 @@
         scale(var(--clip03-symbol-scale, 1));
     }
 
-    /*
-      Iris mit echtem "Loch":
-      schwarzer Ring liegt außen und schließt zur Mitte.
-      Die Mitte bleibt durchsichtig, bis sie bei 100% komplett geschlossen ist.
-    */
-    .clip03-iris {
+    /* Frau ab Songsekunde 12: links im Innenfeld, bewusst weit weg vom Rahmen. */
+    .clip03-woman {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      z-index: 100;
-      width: 200vmax;
-      height: 200vmax;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      background: transparent;
-      box-shadow: 0 0 0 200vmax #000;
-      will-change: width, height;
-    }
-
-    .clip03-iris--closing {
-      width: 200vmax;
-      height: 200vmax;
-      transition:
-        width 1150ms cubic-bezier(.58,.02,.42,.98),
-        height 1150ms cubic-bezier(.58,.02,.42,.98);
-    }
-
-    .clip03-iris--closing.is-active {
-      width: 0;
-      height: 0;
-    }
-
-    /* Clip 03 AUSBLENDE: keine Iris mehr. Das komplett schwarze Bild
-       fadet als ganze Fläche weich weg und gibt die neue Szene frei. */
-    .clip03-fade-out {
-      position: absolute;
-      inset: 0;
-      z-index: 100;
-      background: #000;
-      opacity: 1;
-      pointer-events: none;
-      transition: opacity 1050ms cubic-bezier(.2,.72,.25,1);
-      will-change: opacity;
-    }
-
-    .clip03-fade-out.is-active {
+      left: 22%;
+      bottom: 7.5%;
+      z-index: 8;
+      display: block;
+      width: auto;
+      height: min(68vh, 72vw);
+      max-width: 29vw;
+      object-fit: contain;
+      object-position: left bottom;
       opacity: 0;
+      transform: translate(-50%, 2.5%) scale(.985);
+      transform-origin: center bottom;
+      user-select: none;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 15px rgba(0,0,0,.50));
+      transition:
+        opacity 900ms cubic-bezier(.2,.72,.25,1),
+        transform 900ms cubic-bezier(.2,.72,.25,1);
+    }
+
+    .clip03-woman.is-active {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
     }
 
   </style>
@@ -461,6 +467,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-sequence-02"></script>
+  <script src="app.js?v=clip03-sequence-03"></script>
 </body>
 </html>

@@ -12,6 +12,9 @@ const clip02Timers = new Set();
 
 let clip03RunToken = 0;
 const clip03Timers = new Set();
+const clip03Soundtrack = new Audio("assets/clip03/lumen-in-tenebris.mp3");
+clip03Soundtrack.preload = "auto";
+clip03Soundtrack.volume = 1;
 
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
@@ -281,13 +284,17 @@ function stopClip03Animation() {
   clip03Timers.forEach((timer) => clearTimeout(timer));
   clip03Timers.clear();
 
+  try {
+    clip03Soundtrack.pause();
+    clip03Soundtrack.currentTime = 0;
+  } catch (_) {}
+
   const layer = getClip03Layer();
   if (layer) layer.innerHTML = "";
 }
 
-function createClip03StaticSymbol(config) {
-  const layer = getClip03Layer();
-  if (!layer) return null;
+function createClip03StaticSymbolIn(container, config) {
+  if (!container) return null;
 
   const img = document.createElement("img");
   img.className = "clip03-symbol";
@@ -304,20 +311,21 @@ function createClip03StaticSymbol(config) {
   img.style.left = `${config.x}%`;
   img.style.top = `${config.y}%`;
 
-  layer.appendChild(img);
+  container.appendChild(img);
   return img;
 }
 
-function buildClip03FinalScene() {
-  const current = getClipStageBackground();
-  const layer = getClip03Layer();
+function buildClip03FinalScene(container) {
+  if (!container) return;
 
-  if (!current || !layer) return;
+  const background = document.createElement("img");
+  background.className = "clip03-scene-background";
+  background.src = "assets/clip01/frame-clean.png";
+  background.alt = "";
+  background.draggable = false;
+  container.appendChild(background);
 
-  current.src = "assets/clip01/frame-clean.png";
-  layer.innerHTML = "";
-
-  createClip03StaticSymbol({
+  createClip03StaticSymbolIn(container, {
     src: "assets/clip01/goat.png",
     width: "12.2vw",
     x: 50.0,
@@ -325,7 +333,7 @@ function buildClip03FinalScene() {
     scale: .93
   });
 
-  createClip03StaticSymbol({
+  createClip03StaticSymbolIn(container, {
     src: "assets/clip01/helmet.png",
     width: "7.0vw",
     x: 4.6,
@@ -333,7 +341,7 @@ function buildClip03FinalScene() {
     scale: .72
   });
 
-  createClip03StaticSymbol({
+  createClip03StaticSymbolIn(container, {
     src: "assets/clip01/helmet.png",
     width: "7.0vw",
     x: 95.0,
@@ -342,7 +350,7 @@ function buildClip03FinalScene() {
     mirrored: true
   });
 
-  createClip03StaticSymbol({
+  createClip03StaticSymbolIn(container, {
     src: "assets/clip01/sword.png",
     width: "10.2vw",
     x: 4.3,
@@ -350,7 +358,7 @@ function buildClip03FinalScene() {
     scale: .88
   });
 
-  createClip03StaticSymbol({
+  createClip03StaticSymbolIn(container, {
     src: "assets/clip01/sword.png",
     width: "10.2vw",
     x: 95.3,
@@ -358,7 +366,7 @@ function buildClip03FinalScene() {
     scale: .88
   });
 
-  createClip03StaticSymbol({
+  createClip03StaticSymbolIn(container, {
     src: "assets/clip01/cup.png",
     width: "8.7vw",
     x: 5.2,
@@ -366,7 +374,7 @@ function buildClip03FinalScene() {
     scale: .64
   });
 
-  createClip03StaticSymbol({
+  createClip03StaticSymbolIn(container, {
     src: "assets/clip01/wheel.png",
     width: "8.5vw",
     x: 94.4,
@@ -374,12 +382,27 @@ function buildClip03FinalScene() {
     scale: .68
   });
 
-  createClip03StaticSymbol({
+  createClip03StaticSymbolIn(container, {
     src: "assets/clip01/bottom-shield.png",
     width: "9.3vw",
     x: 50.0,
     y: 92.2,
     scale: .84
+  });
+}
+
+function showClip03Woman(layer, token) {
+  if (!layer || token !== clip03RunToken) return;
+
+  const woman = document.createElement("img");
+  woman.className = "clip03-woman";
+  woman.src = "assets/clip03/woman.webp";
+  woman.alt = "";
+  woman.draggable = false;
+  layer.appendChild(woman);
+
+  requestAnimationFrame(() => {
+    if (token === clip03RunToken) woman.classList.add("is-active");
   });
 }
 
@@ -393,8 +416,9 @@ async function playClip03() {
 
   if (!current || !next || !layer) return;
 
-  // 1) Erst eine Sekunde lang exakt der normale, bereits hinterlegte Standardrahmen.
+  // 1) Eine Sekunde lang exakt der normale hinterlegte Standardrahmen.
   current.src = "assets/clip-frame.png";
+  current.style.opacity = "1";
   next.style.transition = "none";
   next.style.opacity = "0";
   next.src = "";
@@ -402,42 +426,52 @@ async function playClip03() {
 
   if (!(await waitClip03(1000, token))) return;
 
-  // 2) Klassische Iris schließt von außen nach innen bis zur Bildmitte.
-  const iris = document.createElement("div");
-  iris.className = "clip03-iris clip03-iris--closing";
-  layer.appendChild(iris);
-
-  // Startzustand wirklich rendern lassen.
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  if (token !== clip03RunToken) return;
-
-  iris.classList.add("is-active");
-
-  if (!(await waitClip03(1150, token))) return;
-
-  // 3) Im komplett schwarzen Moment wird ausschließlich der Inhalt darunter ersetzt.
-  buildClip03FinalScene();
-
-  if (!(await waitClip03(100, token))) return;
-
-  // 4) AUSBLENDE: keine rückwärts laufende Iris mehr.
-  // Das Schwarz fadet als komplette Fläche weich weg und gibt die neue Szene frei.
-  iris.remove();
-
-  const fadeOut = document.createElement("div");
-  fadeOut.className = "clip03-fade-out";
-  layer.appendChild(fadeOut);
+  // 2) Keine Iris mehr: die KOMPLETTE neue Szene liegt als zweite Ebene darüber
+  // und fadet als Ganzes weich ein.
+  const scene = document.createElement("div");
+  scene.className = "clip03-final-scene";
+  buildClip03FinalScene(scene);
+  layer.appendChild(scene);
 
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   if (token !== clip03RunToken) return;
 
-  fadeOut.classList.add("is-active");
+  scene.classList.add("is-active");
 
-  if (!(await waitClip03(1050, token))) return;
+  if (!(await waitClip03(1300, token))) return;
 
-  fadeOut.remove();
+  // Der neue Hintergrund ist jetzt vollständig da.
+  // Ab exakt diesem Moment beginnt die Musik.
+  try {
+    clip03Soundtrack.currentTime = 0;
+    clip03Soundtrack.volume = 1;
+    await clip03Soundtrack.play();
+  } catch (_) {
+    return;
+  }
 
-  // Szene bleibt anschließend unverändert stehen.
+  if (token !== clip03RunToken) return;
+
+  // 3) Exakt bei Songsekunde 12 erscheint die Frau links,
+  // bewusst innerhalb der freien Bildfläche und ohne den Rahmen zu berühren.
+  const waitForWoman = () => {
+    if (token !== clip03RunToken) return;
+
+    if (clip03Soundtrack.currentTime >= 12) {
+      showClip03Woman(layer, token);
+      return;
+    }
+
+    if (!clip03Soundtrack.ended) {
+      const timer = setTimeout(() => {
+        clip03Timers.delete(timer);
+        waitForWoman();
+      }, 30);
+      clip03Timers.add(timer);
+    }
+  };
+
+  waitForWoman();
 }
 
 function getFrameForClip(clipNumber) {
