@@ -92,7 +92,7 @@ const clip02Images = [
   "assets/clip02/15-steinkreuz.webp"
 ];
 
-const clip02CueTimes = clip02Images.map((_, index) => 1 + index * 4);
+const clip02CueTimes = clip02Images.map((_, index) => index === 0 ? 1 : 1.25 + index * 4);
 
 function clearClip02Timers() {
   clip02Timers.forEach((timer) => clearTimeout(timer));
@@ -675,6 +675,9 @@ function openClip(clipNumber) {
 
   if (clipNumber === 1) {
     clipStageBackground.src = "assets/clip01/frame-clean.webp";
+  } else if (clipNumber === 2) {
+    // Clip 02: ursprünglicher Goldrahmen bleibt permanent als Hintergrund sichtbar.
+    clipStageBackground.src = "assets/clip-frame.png";
   } else {
     clipStageBackground.src = getFrameForClip(clipNumber);
   }
