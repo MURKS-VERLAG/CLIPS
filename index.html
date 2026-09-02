@@ -18,7 +18,8 @@
       background: #000;
     }
 
-    .clip-stage__background {
+    .clip-stage__background,
+    .clip-stage__background-next {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -28,6 +29,105 @@
       object-position: center center;
       user-select: none;
       pointer-events: none;
+    }
+
+    .clip-stage__background {
+      z-index: 1;
+    }
+
+    .clip-stage__background-next {
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 180ms ease-in-out;
+    }
+
+    .clip01-animation-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .clip01-symbol {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: block;
+      width: var(--symbol-width);
+      height: auto;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(var(--symbol-scale, 1));
+      transform-origin: center center;
+      will-change: left, top, opacity, transform;
+      user-select: none;
+      pointer-events: none;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,.45));
+    }
+
+    .clip01-symbol.is-mirrored {
+      transform: translate(-50%, -50%) scaleX(-1) scale(var(--symbol-scale, 1));
+    }
+
+    .clip01-puff {
+      position: absolute;
+      z-index: 20;
+      width: clamp(70px, 9vw, 170px);
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(.25);
+      opacity: 0;
+      pointer-events: none;
+      border-radius: 50%;
+      filter: blur(1px);
+    }
+
+    .clip01-puff::before,
+    .clip01-puff::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+    }
+
+    .clip01-puff--dark {
+      background:
+        radial-gradient(circle at 48% 52%, rgba(20,20,20,.98) 0 21%, rgba(78,78,78,.84) 22% 37%, rgba(20,20,20,.82) 38% 54%, transparent 69%);
+    }
+
+    .clip01-puff--dark::before {
+      inset: 8% 33% 39% 2%;
+      background: radial-gradient(circle, rgba(105,105,105,.9) 0 36%, rgba(18,18,18,.76) 58%, transparent 72%);
+    }
+
+    .clip01-puff--dark::after {
+      inset: 31% 3% 7% 35%;
+      background: radial-gradient(circle, rgba(82,82,82,.88) 0 34%, rgba(12,12,12,.82) 58%, transparent 73%);
+    }
+
+    .clip01-puff--gold {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,225,111,.98) 0 19%, rgba(214,164,43,.88) 21% 40%, rgba(111,70,5,.72) 42% 58%, transparent 72%);
+      filter: blur(1px) drop-shadow(0 0 14px rgba(241,194,69,.55));
+    }
+
+    .clip01-puff--gold::before {
+      inset: 5% 38% 40% 1%;
+      background: radial-gradient(circle, rgba(255,233,138,.95), rgba(175,116,13,.68) 58%, transparent 74%);
+    }
+
+    .clip01-puff--gold::after {
+      inset: 35% 1% 4% 38%;
+      background: radial-gradient(circle, rgba(255,217,84,.94), rgba(155,94,7,.68) 58%, transparent 74%);
+    }
+
+    .clip01-puff.is-active {
+      animation: clip01Puff .72s ease-out forwards;
+    }
+
+    @keyframes clip01Puff {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(.18); }
+      16%  { opacity: 1; transform: translate(-50%, -50%) scale(.72); }
+      52%  { opacity: .96; transform: translate(-50%, -50%) scale(1.16); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.52); }
     }
   </style>
 </head>
@@ -48,9 +148,7 @@
         type="button"
         aria-label="Vorherige Seite"
         title="Vorherige Seite"
-      >
-        ←
-      </button>
+      >←</button>
 
       <button
         id="nextPage"
@@ -58,9 +156,7 @@
         type="button"
         aria-label="Nächste Seite"
         title="Nächste Seite"
-      >
-        →
-      </button>
+      >→</button>
     </nav>
   </main>
 
@@ -72,8 +168,16 @@
       alt=""
       draggable="false"
     >
+    <img
+      id="clipStageBackgroundNext"
+      class="clip-stage__background-next"
+      src=""
+      alt=""
+      draggable="false"
+    >
+    <div id="clip01AnimationLayer" class="clip01-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip-stage-02"></script>
+  <script src="app.js?v=clip01-sequence-01"></script>
 </body>
 </html>
