@@ -9,6 +9,10 @@ const clip01Timers = new Set();
 let clip02RunToken = 0;
 let clip02Raf = null;
 const clip02Timers = new Set();
+
+let clip03RunToken = 0;
+const clip03Timers = new Set();
+
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
 clip02Soundtrack.volume = 1;
@@ -72,6 +76,10 @@ function getClip01Layer() {
 
 function getClip02Layer() {
   return document.getElementById("clip02AnimationLayer");
+}
+
+function getClip03Layer() {
+  return document.getElementById("clip03AnimationLayer");
 }
 
 const clip02Images = [
@@ -254,6 +262,177 @@ async function playClip02() {
   };
 
   clip02Raf = requestAnimationFrame(tick);
+}
+
+
+function waitClip03(ms, token) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      clip03Timers.delete(timer);
+      resolve(token === clip03RunToken);
+    }, ms);
+    clip03Timers.add(timer);
+  });
+}
+
+function stopClip03Animation() {
+  clip03RunToken += 1;
+
+  clip03Timers.forEach((timer) => clearTimeout(timer));
+  clip03Timers.clear();
+
+  const layer = getClip03Layer();
+  if (layer) layer.innerHTML = "";
+}
+
+function createClip03StaticSymbol(config) {
+  const layer = getClip03Layer();
+  if (!layer) return null;
+
+  const img = document.createElement("img");
+  img.className = "clip03-symbol";
+
+  if (config.mirrored) {
+    img.classList.add("is-mirrored");
+  }
+
+  img.src = config.src;
+  img.alt = "";
+  img.draggable = false;
+  img.style.setProperty("--clip03-symbol-width", config.width);
+  img.style.setProperty("--clip03-symbol-scale", String(config.scale || 1));
+  img.style.left = `${config.x}%`;
+  img.style.top = `${config.y}%`;
+
+  layer.appendChild(img);
+  return img;
+}
+
+function buildClip03FinalScene() {
+  const current = getClipStageBackground();
+  const layer = getClip03Layer();
+
+  if (!current || !layer) return;
+
+  current.src = "assets/clip01/frame-clean.png";
+  layer.innerHTML = "";
+
+  createClip03StaticSymbol({
+    src: "assets/clip01/goat.png",
+    width: "12.2vw",
+    x: 50.0,
+    y: 10.2,
+    scale: .93
+  });
+
+  createClip03StaticSymbol({
+    src: "assets/clip01/helmet.png",
+    width: "7.0vw",
+    x: 4.6,
+    y: 8.1,
+    scale: .72
+  });
+
+  createClip03StaticSymbol({
+    src: "assets/clip01/helmet.png",
+    width: "7.0vw",
+    x: 95.0,
+    y: 8.1,
+    scale: .72,
+    mirrored: true
+  });
+
+  createClip03StaticSymbol({
+    src: "assets/clip01/sword.png",
+    width: "10.2vw",
+    x: 4.3,
+    y: 50.2,
+    scale: .88
+  });
+
+  createClip03StaticSymbol({
+    src: "assets/clip01/sword.png",
+    width: "10.2vw",
+    x: 95.3,
+    y: 50.2,
+    scale: .88
+  });
+
+  createClip03StaticSymbol({
+    src: "assets/clip01/cup.png",
+    width: "8.7vw",
+    x: 5.2,
+    y: 91.6,
+    scale: .64
+  });
+
+  createClip03StaticSymbol({
+    src: "assets/clip01/wheel.png",
+    width: "8.5vw",
+    x: 94.4,
+    y: 91.4,
+    scale: .68
+  });
+
+  createClip03StaticSymbol({
+    src: "assets/clip01/bottom-shield.png",
+    width: "9.3vw",
+    x: 50.0,
+    y: 92.2,
+    scale: .84
+  });
+}
+
+async function playClip03() {
+  stopClip03Animation();
+  const token = clip03RunToken;
+
+  const current = getClipStageBackground();
+  const next = getClipStageBackgroundNext();
+  const layer = getClip03Layer();
+
+  if (!current || !next || !layer) return;
+
+  // 1) Erst eine Sekunde lang exakt der normale, bereits hinterlegte Standardrahmen.
+  current.src = "assets/clip-frame.png";
+  next.style.transition = "none";
+  next.style.opacity = "0";
+  next.src = "";
+  layer.innerHTML = "";
+
+  if (!(await waitClip03(1000, token))) return;
+
+  // 2) Klassische Iris schließt von außen nach innen bis zur Bildmitte.
+  const iris = document.createElement("div");
+  iris.className = "clip03-iris clip03-iris--closing";
+  layer.appendChild(iris);
+
+  // Startzustand wirklich rendern lassen.
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (token !== clip03RunToken) return;
+
+  iris.classList.add("is-active");
+
+  if (!(await waitClip03(760, token))) return;
+
+  // 3) Im komplett schwarzen Moment wird ausschließlich der Inhalt darunter ersetzt.
+  buildClip03FinalScene();
+
+  if (!(await waitClip03(100, token))) return;
+
+  // 4) Gleiche Iris rückwärts: Mitte öffnet sich und gibt das neue Bild nach außen frei.
+  iris.classList.remove("clip03-iris--closing");
+  iris.classList.add("clip03-iris--opening");
+
+  // Force style reset before opening.
+  void iris.offsetWidth;
+  iris.classList.add("is-active");
+
+  if (!(await waitClip03(900, token))) return;
+
+  iris.remove();
+
+  // Szene bleibt anschließend unverändert stehen.
 }
 
 function getFrameForClip(clipNumber) {
@@ -692,6 +871,7 @@ function openClip(clipNumber) {
 
   stopClip01Animation();
   stopClip02Animation();
+  stopClip03Animation();
 
   clipStage.dataset.activeClip = String(clipNumber);
 
@@ -715,6 +895,8 @@ function openClip(clipNumber) {
     requestAnimationFrame(() => playClip01());
   } else if (clipNumber === 2) {
     requestAnimationFrame(() => playClip02());
+  } else if (clipNumber === 3) {
+    requestAnimationFrame(() => playClip03());
   }
 }
 
@@ -725,6 +907,7 @@ function closeClip() {
 
   stopClip01Animation();
   stopClip02Animation();
+  stopClip03Animation();
 
   clipStage.hidden = true;
   clipStage.style.setProperty("display", "none", "important");

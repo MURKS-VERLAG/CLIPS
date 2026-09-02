@@ -328,6 +328,84 @@
       }
     }
 
+
+    /* CLIP 03: statischer Clip-01-Zielzustand + klassische Irisblende. */
+    .clip03-animation-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 14;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .clip03-symbol {
+      position: absolute;
+      display: block;
+      width: var(--clip03-symbol-width);
+      height: auto;
+      opacity: 1;
+      transform:
+        translate(-50%, -50%)
+        scale(var(--clip03-symbol-scale, 1));
+      transform-origin: center center;
+      user-select: none;
+      pointer-events: none;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,.45));
+    }
+
+    .clip03-symbol.is-mirrored {
+      transform:
+        translate(-50%, -50%)
+        scaleX(-1)
+        scale(var(--clip03-symbol-scale, 1));
+    }
+
+    /*
+      Iris mit echtem "Loch":
+      schwarzer Ring liegt außen und schließt zur Mitte.
+      Die Mitte bleibt durchsichtig, bis sie bei 100% komplett geschlossen ist.
+    */
+    .clip03-iris {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 100;
+      width: 200vmax;
+      height: 200vmax;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      background: transparent;
+      box-shadow: 0 0 0 200vmax #000;
+      will-change: width, height;
+    }
+
+    .clip03-iris--closing {
+      width: 200vmax;
+      height: 200vmax;
+      transition:
+        width 760ms cubic-bezier(.58,.02,.42,.98),
+        height 760ms cubic-bezier(.58,.02,.42,.98);
+    }
+
+    .clip03-iris--closing.is-active {
+      width: 0;
+      height: 0;
+    }
+
+    .clip03-iris--opening {
+      width: 0;
+      height: 0;
+      transition:
+        width 900ms cubic-bezier(.2,.72,.25,1),
+        height 900ms cubic-bezier(.2,.72,.25,1);
+    }
+
+    .clip03-iris--opening.is-active {
+      width: 200vmax;
+      height: 200vmax;
+    }
+
   </style>
 </head>
 
@@ -376,8 +454,9 @@
     >
     <div id="clip01AnimationLayer" class="clip01-animation-layer"></div>
     <div id="clip02AnimationLayer" class="clip02-animation-layer"></div>
+    <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip02-sequence-04"></script>
+  <script src="app.js?v=clip03-sequence-01"></script>
 </body>
 </html>
