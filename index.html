@@ -382,6 +382,85 @@
         scale(var(--clip03-symbol-scale, 1));
     }
 
+    /* Clip 03: Gedös-Bild + Schrift, gemeinsam 3–11 s. */
+    .clip03-gedoes-card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 7;
+      width: min(52vw, 820px);
+      height: min(70vh, 780px);
+      transform: translate(-50%, -50%) scale(.985);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 900ms cubic-bezier(.2,.72,.25,1),
+                  transform 900ms cubic-bezier(.2,.72,.25,1);
+    }
+
+    .clip03-gedoes-card.is-visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .clip03-gedoes-card.is-fading-out {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.99);
+    }
+
+    .clip03-gedoes-image {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 7px 12px rgba(0,0,0,.42));
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .clip03-gedoes-title {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      z-index: 2;
+      width: 88%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #fff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(18px, 2.15vw, 38px);
+      line-height: 1.08;
+      letter-spacing: .045em;
+      text-shadow:
+        -2px -2px 0 #a47a24,
+         2px -2px 0 #a47a24,
+        -2px  2px 0 #a47a24,
+         2px  2px 0 #a47a24,
+         0 3px 7px rgba(0,0,0,.88);
+    }
+
+    .clip03-gedoes-title strong,
+    .clip03-gedoes-title em { display: block; }
+
+    .clip03-gedoes-title strong { font-weight: 800; }
+
+    .clip03-gedoes-title em {
+      margin: .16em 0 .24em;
+      font-size: .72em;
+      font-weight: 400;
+      letter-spacing: .02em;
+    }
+
+    .clip03-gedoes-subtitle {
+      font-size: .76em;
+      letter-spacing: .035em;
+    }
+
     /* Frau bleibt exakt in der bisherigen linken sicheren Innenposition. */
     .clip03-woman {
       position: absolute;

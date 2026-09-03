@@ -16,6 +16,7 @@ const clip03Soundtrack = new Audio("assets/clip03/lumen-in-tenebris.mp3");
 clip03Soundtrack.preload = "auto";
 clip03Soundtrack.volume = 1;
 
+const clip03GedoresImage = "assets/clip03/gedoes-hubacker.webp";
 const clip03WomanRest = "assets/clip03/woman-rest.webp";
 const clip03WomanSingImages = [
   "assets/clip03/woman-sing-01.webp",
@@ -403,6 +404,41 @@ function buildClip03FinalScene(container) {
   });
 }
 
+function createClip03GedoresCard(layer) {
+  const card = document.createElement("div");
+  card.className = "clip03-gedoes-card";
+
+  const img = document.createElement("img");
+  img.className = "clip03-gedoes-image";
+  img.src = clip03GedoresImage;
+  img.alt = "";
+  img.draggable = false;
+
+  const title = document.createElement("div");
+  title.className = "clip03-gedoes-title";
+  title.innerHTML = `
+    <strong>DAS GEDÖS</strong>
+    <em>das Getöse</em>
+    <strong class="clip03-gedoes-subtitle">Talenge bei Hubacker</strong>
+  `;
+
+  card.appendChild(img);
+  card.appendChild(title);
+  layer.appendChild(card);
+  return card;
+}
+
+function showClip03GedoresCard(card) {
+  if (!card) return;
+  requestAnimationFrame(() => card.classList.add("is-visible"));
+}
+
+function hideClip03GedoresCard(card) {
+  if (!card) return;
+  card.classList.remove("is-visible");
+  card.classList.add("is-fading-out");
+}
+
 function getClip03Woman(layer) {
   if (!layer) return null;
 
@@ -516,8 +552,10 @@ async function playClip03() {
   buildClip03FinalScene(scene);
   layer.appendChild(scene);
 
-  // Alle Frauenbilder vorladen, damit die 0,3-s-Wechsel sauber bleiben.
-  [clip03WomanRest, ...clip03WomanSingImages].forEach((src) => {
+  const gedoesCard = createClip03GedoresCard(layer);
+
+  // Gedösbild + alle Frauenbilder vorladen, damit die 0,3-s-Wechsel sauber bleiben.
+  [clip03GedoresImage, clip03WomanRest, ...clip03WomanSingImages].forEach((src) => {
     const preload = new Image();
     preload.src = src;
   });
@@ -540,6 +578,14 @@ async function playClip03() {
     if (token !== clip03RunToken) return;
 
     const t = clip03Soundtrack.currentTime;
+
+    if (t >= 3 && t < 11 && !gedoesCard.classList.contains("is-visible")) {
+      showClip03GedoresCard(gedoesCard);
+    }
+
+    if (t >= 11 && !gedoesCard.classList.contains("is-fading-out")) {
+      hideClip03GedoresCard(gedoesCard);
+    }
 
     if (t >= 12 && t < 20 && phase !== "sing12") {
       phase = "sing12";
