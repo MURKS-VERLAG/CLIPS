@@ -461,6 +461,105 @@
       letter-spacing: .035em;
     }
 
+
+    /* Clip 03: Burgenfolge rechts/mittig parallel zur Frau. */
+    .clip03-castle-sequence {
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      pointer-events: none;
+    }
+
+    .clip03-castle-card {
+      position: absolute;
+      left: 66%;
+      top: 52%;
+      width: min(43vw, 780px);
+      height: min(61vh, 670px);
+      transform: translate(-50%, -50%) scale(.985);
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity 900ms cubic-bezier(.2,.72,.25,1),
+        transform 900ms cubic-bezier(.2,.72,.25,1);
+    }
+
+    .clip03-castle-card.is-visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .clip03-castle-card.is-fading-out {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.99);
+    }
+
+    .clip03-castle-image {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 8px 15px rgba(0,0,0,.48));
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .clip03-castle-title {
+      position: absolute;
+      left: 50%;
+      top: 49%;
+      z-index: 2;
+      width: 82%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #fff;
+      opacity: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(15px, 1.55vw, 29px);
+      line-height: 1.08;
+      letter-spacing: .035em;
+      text-shadow:
+        -2px -2px 0 #a47a24,
+         2px -2px 0 #a47a24,
+        -2px  2px 0 #a47a24,
+         2px  2px 0 #a47a24,
+         0 3px 7px rgba(0,0,0,.92);
+      transition: opacity 650ms ease-in-out;
+      pointer-events: none;
+    }
+
+    .clip03-castle-title.is-visible { opacity: 1; }
+
+    .clip03-castle-title strong,
+    .clip03-castle-title em,
+    .clip03-castle-title span {
+      display: block;
+    }
+
+    .clip03-castle-title strong {
+      font-size: 1.18em;
+      font-weight: 800;
+      margin-bottom: .12em;
+    }
+
+    .clip03-castle-title em {
+      margin-bottom: .28em;
+      font-size: .88em;
+      font-weight: 400;
+    }
+
+    .clip03-castle-title span {
+      margin-top: .14em;
+      font-size: .72em;
+      font-weight: 700;
+    }
+
     /* Frau bleibt exakt in der bisherigen linken sicheren Innenposition. */
     .clip03-woman {
       position: absolute;
@@ -547,6 +646,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-gedoes-02"></script>
+  <script src="app.js?v=clip03-burgen-01"></script>
 </body>
 </html>

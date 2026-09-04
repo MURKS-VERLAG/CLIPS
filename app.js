@@ -17,6 +17,8 @@ clip03Soundtrack.preload = "auto";
 clip03Soundtrack.volume = 1;
 
 const clip03GedoresImage = "assets/clip03/gedoes-hubacker.webp";
+const clip03NuwensteinImage = "assets/clip03/nuwenstein.webp";
+const clip03BerenbachImage = "assets/clip03/berenbach.webp";
 const clip03WomanRest = "assets/clip03/woman-rest.webp";
 const clip03WomanSingImages = [
   "assets/clip03/woman-sing-01.webp",
@@ -439,6 +441,78 @@ function hideClip03GedoresCard(card) {
   card.classList.add("is-fading-out");
 }
 
+
+function createClip03CastleSequence(layer) {
+  const sequence = document.createElement("div");
+  sequence.className = "clip03-castle-sequence";
+
+  const makeCard = (src, titleHtml, extraClass) => {
+    const card = document.createElement("div");
+    card.className = `clip03-castle-card ${extraClass}`;
+
+    const img = document.createElement("img");
+    img.className = "clip03-castle-image";
+    img.src = src;
+    img.alt = "";
+    img.draggable = false;
+
+    const title = document.createElement("div");
+    title.className = "clip03-castle-title";
+    title.innerHTML = titleHtml;
+
+    card.appendChild(img);
+    card.appendChild(title);
+    sequence.appendChild(card);
+    return { card, title };
+  };
+
+  const nuwenstein = makeCard(
+    clip03NuwensteinImage,
+    `
+      <strong>NUWENSTEIN</strong>
+      <em>Neuenstein</em>
+      <span>Als „Burgstall Alt-Neuenstein“ dokumentiert</span>
+      <span>Waldgebiet Hubackerhof</span>
+    `,
+    "clip03-castle-card--nuwenstein"
+  );
+
+  const berenbach = makeCard(
+    clip03BerenbachImage,
+    `
+      <strong>BERNBACH / BERENBACH</strong>
+      <em>Burg Bärenbach</em>
+      <span>Otschenfeld bei Ramsbach</span>
+    `,
+    "clip03-castle-card--berenbach"
+  );
+
+  layer.appendChild(sequence);
+  return { sequence, nuwenstein, berenbach };
+}
+
+function showClip03CastleCard(entry) {
+  if (!entry?.card) return;
+  entry.card.classList.remove("is-fading-out");
+  requestAnimationFrame(() => entry.card.classList.add("is-visible"));
+}
+
+function hideClip03CastleCard(entry) {
+  if (!entry?.card) return;
+  entry.card.classList.remove("is-visible");
+  entry.card.classList.add("is-fading-out");
+}
+
+function showClip03CastleTitle(entry) {
+  if (!entry?.title) return;
+  requestAnimationFrame(() => entry.title.classList.add("is-visible"));
+}
+
+function hideClip03CastleTitle(entry) {
+  if (!entry?.title) return;
+  entry.title.classList.remove("is-visible");
+}
+
 function getClip03Woman(layer) {
   if (!layer) return null;
 
@@ -553,9 +627,10 @@ async function playClip03() {
   layer.appendChild(scene);
 
   const gedoesCard = createClip03GedoresCard(layer);
+  const castleSequence = createClip03CastleSequence(layer);
 
-  // Gedösbild + alle Frauenbilder vorladen, damit die 0,3-s-Wechsel sauber bleiben.
-  [clip03GedoresImage, clip03WomanRest, ...clip03WomanSingImages].forEach((src) => {
+  // Gedösbild + Burgenbilder + alle Frauenbilder vorladen, damit die 0,3-s-Wechsel sauber bleiben.
+  [clip03GedoresImage, clip03NuwensteinImage, clip03BerenbachImage, clip03WomanRest, ...clip03WomanSingImages].forEach((src) => {
     const preload = new Image();
     preload.src = src;
   });
@@ -573,6 +648,8 @@ async function playClip03() {
 
   let phase = "before12";
   let singingRun = 0;
+  let castlePhase = "before12";
+  let castleTitlePhase = "before12";
 
   const tick = () => {
     if (token !== clip03RunToken) return;
@@ -585,6 +662,48 @@ async function playClip03() {
 
     if (t >= 11 && !gedoesCard.classList.contains("is-fading-out")) {
       hideClip03GedoresCard(gedoesCard);
+    }
+
+
+    // Burgfolge parallel zur singenden Frau.
+    if (t >= 12 && t < 17 && castlePhase !== "nuwenstein") {
+      castlePhase = "nuwenstein";
+      showClip03CastleCard(castleSequence.nuwenstein);
+      hideClip03CastleCard(castleSequence.berenbach);
+    }
+
+    if (t >= 12 && t < 15 && castleTitlePhase !== "nuwenstein-title") {
+      castleTitlePhase = "nuwenstein-title";
+      showClip03CastleTitle(castleSequence.nuwenstein);
+    }
+
+    if (t >= 15 && t < 17 && castleTitlePhase !== "nuwenstein-off") {
+      castleTitlePhase = "nuwenstein-off";
+      hideClip03CastleTitle(castleSequence.nuwenstein);
+    }
+
+    if (t >= 17 && t < 22 && castlePhase !== "berenbach") {
+      castlePhase = "berenbach";
+      hideClip03CastleCard(castleSequence.nuwenstein);
+      showClip03CastleCard(castleSequence.berenbach);
+    }
+
+    if (t >= 17 && t < 20 && castleTitlePhase !== "berenbach-title") {
+      castleTitlePhase = "berenbach-title";
+      showClip03CastleTitle(castleSequence.berenbach);
+    }
+
+    if (t >= 20 && t < 22 && castleTitlePhase !== "berenbach-off") {
+      castleTitlePhase = "berenbach-off";
+      hideClip03CastleTitle(castleSequence.berenbach);
+    }
+
+    if (t >= 22 && castlePhase !== "done") {
+      castlePhase = "done";
+      hideClip03CastleCard(castleSequence.nuwenstein);
+      hideClip03CastleCard(castleSequence.berenbach);
+      hideClip03CastleTitle(castleSequence.nuwenstein);
+      hideClip03CastleTitle(castleSequence.berenbach);
     }
 
     if (t >= 12 && t < 20 && phase !== "sing12") {
