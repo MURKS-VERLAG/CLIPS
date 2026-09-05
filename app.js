@@ -66,6 +66,9 @@ const clip03DialogCenterImage04 = "assets/clip03/dialog-center-04-knight.png";
 const clip03DialogGoatImage01 = "assets/clip03/dialog-goat-01-tongue.png";
 const clip03DialogGoatImage02 = "assets/clip03/dialog-goat-02-front.png";
 const clip03DialogGoatImage03 = "assets/clip03/dialog-goat-03-blank.png";
+const clip03FamilyJohannesBerenbachImage = "assets/clip03/dialog-family-johannes-berenbach.webp";
+const clip03FamilyBurkhartBerenbachImage = "assets/clip03/dialog-family-burkhart-berenbach.webp";
+const clip03FamilyNothburgaNuwensteinImage = "assets/clip03/dialog-family-nothburga-nuwenstein.webp";
 
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
@@ -947,6 +950,96 @@ async function fadeOutClip03DialogSidesWithSmoke(d, token) {
   return true;
 }
 
+
+function createClip03WaldstrasseFamily(d) {
+  const scene = d.scene;
+
+  const centerName = document.createElement("div");
+  centerName.className = "clip03-waldstrasse-name clip03-waldstrasse-name--center";
+  centerName.innerHTML = `JOHANN<br><span>"WALDSTRAßE/SNEITE"</span><br>BERENBACH`;
+
+  const johannes = document.createElement("div");
+  johannes.className = "clip03-waldstrasse-person clip03-waldstrasse-person--johannes";
+  johannes.innerHTML = `
+    <img src="${clip03FamilyJohannesBerenbachImage}" alt="" draggable="false">
+    <div class="clip03-waldstrasse-name clip03-waldstrasse-name--green">JOHANNES BERENBACH</div>
+  `;
+
+  const burkhart = document.createElement("div");
+  burkhart.className = "clip03-waldstrasse-person clip03-waldstrasse-person--burkhart";
+  burkhart.innerHTML = `
+    <img src="${clip03FamilyBurkhartBerenbachImage}" alt="" draggable="false">
+    <div class="clip03-waldstrasse-name clip03-waldstrasse-name--green">BURKHART BERENBACH</div>
+  `;
+
+  const nothburga = document.createElement("div");
+  nothburga.className = "clip03-waldstrasse-person clip03-waldstrasse-person--nothburga";
+  nothburga.innerHTML = `
+    <img src="${clip03FamilyNothburgaNuwensteinImage}" alt="" draggable="false">
+    <div class="clip03-waldstrasse-name clip03-waldstrasse-name--blue">NOTHBURGA NUWENSTEIN</div>
+  `;
+
+  const rings = document.createElement("div");
+  rings.className = "clip03-waldstrasse-rings";
+  rings.innerHTML = `
+    <span class="clip03-waldstrasse-ring clip03-waldstrasse-ring--left"></span>
+    <span class="clip03-waldstrasse-ring clip03-waldstrasse-ring--right"></span>
+  `;
+
+  scene.append(centerName, johannes, burkhart, nothburga, rings);
+
+  return { centerName, johannes, burkhart, nothburga, rings };
+}
+
+function showClip03WaldstrasseElement(el) {
+  if (!el) return;
+  el.classList.remove("is-fading-out");
+  requestAnimationFrame(() => el.classList.add("is-visible"));
+}
+
+function hideClip03WaldstrasseElement(el) {
+  if (!el) return;
+  el.classList.remove("is-visible");
+  el.classList.add("is-fading-out");
+}
+
+async function playClip03WaldstrasseFamily(d, token) {
+  if (token !== clip03RunToken) return;
+
+  const family = createClip03WaldstrasseFamily(d);
+
+  // Flackern ist vorbei: Mittelcharakter bleibt auf seinem Grundbild stehen.
+  // Direkt auf ihm erscheint sein dreizeiliger Name.
+  showClip03WaldstrasseElement(family.centerName);
+
+  // Ganz links Johannes.
+  showClip03WaldstrasseElement(family.johannes);
+
+  // Eine Sekunde später direkt rechts daneben Burkhart.
+  if (!(await waitClip03(1000, token))) return;
+  showClip03WaldstrasseElement(family.burkhart);
+
+  // Fünf Sekunden später Nothburga rechts vom Mittelcharakter.
+  if (!(await waitClip03(5000, token))) return;
+  showClip03WaldstrasseElement(family.nothburga);
+
+  // Eine Sekunde nach Nothburgas Einblendung die Eheringe zwischen Mitte und ihr.
+  if (!(await waitClip03(1000, token))) return;
+  showClip03WaldstrasseElement(family.rings);
+
+  // Sobald alles vollständig eingeblendet ist: 5 Sekunden stehen lassen.
+  if (!(await waitClip03(5000, token))) return;
+
+  // Alles außer dem Mittelcharakter selbst fadet gemeinsam smooth heraus.
+  [
+    family.centerName,
+    family.johannes,
+    family.burkhart,
+    family.nothburga,
+    family.rings
+  ].forEach(hideClip03WaldstrasseElement);
+}
+
 async function flickerClip03Center(d, layer, token) {
   if (token !== clip03RunToken) return;
 
@@ -982,17 +1075,19 @@ async function flickerClip03Center(d, layer, token) {
   }, 400);
   clip03Timers.add(first);
 
-  // Flackern ist jetzt vollständig unabhängig vom Verschwinden der Außenfiguren
-  // und läuft bewusst deutlich länger: 7,2 Sekunden.
-  if (!(await waitClip03(7200, token))) {
+  // Flackern endet jetzt 2 Sekunden früher: 5,2 Sekunden.
+  if (!(await waitClip03(5200, token))) {
     running = false;
     return;
   }
 
   running = false;
 
-  // Danach wie bisher: Mittelcharakter zurück auf Anhang 1 und stehen lassen.
+  // Mittelcharakter zurück auf Anhang 1 und stehen lassen.
   setClip03DialogImage(d.center, clip03DialogCenterImage01);
+
+  // Danach direkt die neue Waldstraße/Berenbach-Familienfolge.
+  await playClip03WaldstrasseFamily(d, token);
 }
 
 async function playClip03PostPuffDialogue(layer, token) {
@@ -1174,7 +1269,10 @@ async function playClip03() {
     clip03DialogCenterImage04,
     clip03DialogGoatImage01,
     clip03DialogGoatImage02,
-    clip03DialogGoatImage03
+    clip03DialogGoatImage03,
+    clip03FamilyJohannesBerenbachImage,
+    clip03FamilyBurkhartBerenbachImage,
+    clip03FamilyNothburgaNuwensteinImage
   ].forEach((src) => {
     const preload = new Image();
     preload.src = src;

@@ -1081,8 +1081,8 @@
     .clip03-dialog-bubble--center.is-fading-out{opacity:0;transform:translate(-50%,-5px) scale(.98);}
 
     .clip03-dialog-center-reveal{
-      position:absolute;left:50%;bottom:13%;z-index:24;
-      width:min(31vw,470px);height:min(70vh,760px);
+      position:absolute;left:50%;bottom:17%;z-index:24;
+      width:min(26vw,410px);height:min(62vh,680px);
       transform:translateX(-50%);overflow:hidden;opacity:1;pointer-events:none;
     }
     .clip03-dialog-center-character{
@@ -1209,6 +1209,197 @@
 
     .clip03-dialog-goat{transition:none !important;}
 
+    /* Clip 03: Waldstraße/Sneite-Berenbach-Familienbild nach dem Flackern. */
+    .clip03-waldstrasse-person{
+      position:absolute;
+      z-index:26;
+      bottom:10%;
+      opacity:0;
+      transform:translateX(-50%) translateY(2%) scale(.975);
+      transition:opacity 850ms cubic-bezier(.2,.72,.25,1),
+                 transform 850ms cubic-bezier(.2,.72,.25,1);
+      pointer-events:none;
+    }
+
+    .clip03-waldstrasse-person--johannes{
+      left:11.5%;
+      width:min(17vw,270px);
+      height:min(54vh,590px);
+    }
+
+    .clip03-waldstrasse-person--burkhart{
+      left:27.5%;
+      width:min(15vw,235px);
+      height:min(48vh,520px);
+    }
+
+    .clip03-waldstrasse-person--nothburga{
+      left:77%;
+      width:min(17vw,275px);
+      height:min(55vh,600px);
+    }
+
+    .clip03-waldstrasse-person.is-visible{
+      opacity:1;
+      transform:translateX(-50%) translateY(0) scale(1);
+    }
+
+    .clip03-waldstrasse-person.is-fading-out{
+      opacity:0;
+      transform:translateX(-50%) translateY(1%) scale(.99);
+    }
+
+    .clip03-waldstrasse-person img{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      max-width:100%;
+      max-height:86%;
+      width:auto;
+      height:auto;
+      transform:translateX(-50%);
+      object-fit:contain;
+      object-position:center bottom;
+      filter:drop-shadow(0 8px 15px rgba(0,0,0,.52));
+      user-select:none;
+      pointer-events:none;
+    }
+
+    .clip03-waldstrasse-name{
+      position:absolute;
+      z-index:29;
+      text-align:center;
+      font-family:Georgia,"Times New Roman",serif;
+      font-weight:900;
+      line-height:1.05;
+      letter-spacing:.025em;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 800ms cubic-bezier(.2,.72,.25,1),
+                 transform 800ms cubic-bezier(.2,.72,.25,1);
+    }
+
+    .clip03-waldstrasse-name--center{
+      left:50%;
+      top:45%;
+      width:min(23vw,360px);
+      transform:translate(-50%,-50%) scale(.97);
+      color:#185f38;
+      font-size:clamp(15px,1.55vw,29px);
+      text-shadow:
+        -2px -2px 0 #caa33b,
+         2px -2px 0 #caa33b,
+        -2px  2px 0 #caa33b,
+         2px  2px 0 #caa33b,
+         0 4px 8px rgba(0,0,0,.85);
+    }
+
+    .clip03-waldstrasse-name--center span{
+      display:inline-block;
+      font-size:.86em;
+    }
+
+    .clip03-waldstrasse-name--center.is-visible{
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1);
+    }
+
+    .clip03-waldstrasse-name--center.is-fading-out{
+      opacity:0;
+      transform:translate(-50%,-50%) scale(.98);
+    }
+
+    .clip03-waldstrasse-person .clip03-waldstrasse-name{
+      left:50%;
+      top:1%;
+      width:130%;
+      transform:translate(-50%,7px) scale(.97);
+      font-size:clamp(13px,1.25vw,24px);
+    }
+
+    .clip03-waldstrasse-person .clip03-waldstrasse-name.is-visible{
+      opacity:1;
+      transform:translate(-50%,0) scale(1);
+    }
+
+    .clip03-waldstrasse-person .clip03-waldstrasse-name.is-fading-out{
+      opacity:0;
+      transform:translate(-50%,-4px) scale(.99);
+    }
+
+    /* Drei Berenbacher: grüne Schrift mit Goldrand. */
+    .clip03-waldstrasse-name--green{
+      color:#185f38;
+      text-shadow:
+        -2px -2px 0 #caa33b,
+         2px -2px 0 #caa33b,
+        -2px  2px 0 #caa33b,
+         2px  2px 0 #caa33b,
+         0 3px 7px rgba(0,0,0,.88);
+    }
+
+    /* Nothburga wie die frühere Nuwenstein-Familie: Blau mit weißem Rand. */
+    .clip03-waldstrasse-name--blue{
+      color:#185fa8;
+      text-shadow:
+        -2px -2px 0 #fff,
+         2px -2px 0 #fff,
+        -2px  2px 0 #fff,
+         2px  2px 0 #fff,
+         0 3px 7px rgba(0,0,0,.88);
+    }
+
+    /* Eheringe zwischen Mittelcharakter und Nothburga. */
+    .clip03-waldstrasse-rings{
+      position:absolute;
+      left:64%;
+      top:44%;
+      z-index:30;
+      width:clamp(95px,9vw,170px);
+      height:clamp(62px,6vw,110px);
+      transform:translate(-50%,-50%) scale(.84);
+      opacity:0;
+      transition:opacity 700ms cubic-bezier(.2,.72,.25,1),
+                 transform 700ms cubic-bezier(.2,.72,.25,1);
+      filter:drop-shadow(0 4px 7px rgba(0,0,0,.62));
+      pointer-events:none;
+    }
+
+    .clip03-waldstrasse-rings.is-visible{
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1);
+    }
+
+    .clip03-waldstrasse-rings.is-fading-out{
+      opacity:0;
+      transform:translate(-50%,-50%) scale(.94);
+    }
+
+    .clip03-waldstrasse-ring{
+      position:absolute;
+      top:50%;
+      width:50%;
+      aspect-ratio:1;
+      border:clamp(6px,.62vw,11px) solid #d6a83b;
+      border-radius:50%;
+      box-sizing:border-box;
+      box-shadow:
+        inset 0 0 0 2px rgba(255,239,164,.68),
+        0 0 0 2px rgba(91,54,4,.72),
+        0 4px 8px rgba(0,0,0,.55);
+    }
+
+    .clip03-waldstrasse-ring--left{
+      left:12%;
+      transform:translateY(-50%) rotate(-16deg);
+    }
+
+    .clip03-waldstrasse-ring--right{
+      right:12%;
+      transform:translateY(-50%) rotate(16deg);
+    }
+
+
 
     /* Frau bleibt exakt in der bisherigen linken sicheren Innenposition. */
     .clip03-woman {
@@ -1296,6 +1487,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-smoke-slowrise-02"></script>
+  <script src="app.js?v=clip03-waldstrasse-family-01"></script>
 </body>
 </html>
