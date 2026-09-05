@@ -803,6 +803,234 @@
       pointer-events: none;
     }
 
+
+    /* Clip 03: Familie Berenbach – komplett in der rechten Bildhälfte neben der Sängerin. */
+    .clip03-berenbach-family-sequence {
+      position: absolute;
+      inset: 0;
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    .clip03-berenbach-house-title {
+      position: absolute;
+      left: 70%;
+      top: 50%;
+      width: min(42vw, 700px);
+      transform: translate(-50%, -50%) scale(.985);
+      text-align: center;
+      color: #c62026;
+      opacity: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(24px, 3.25vw, 58px);
+      font-weight: 900;
+      letter-spacing: .05em;
+      line-height: 1;
+      text-shadow:
+        -3px -3px 0 #fff,
+         3px -3px 0 #fff,
+        -3px  3px 0 #fff,
+         3px  3px 0 #fff,
+         0 5px 10px rgba(0,0,0,.72);
+      transition:
+        opacity 650ms cubic-bezier(.2,.72,.25,1),
+        transform 650ms cubic-bezier(.2,.72,.25,1);
+    }
+
+    .clip03-berenbach-house-title.is-visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .clip03-berenbach-house-title.is-fading-out {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.99);
+    }
+
+    /* Obere Reihe: Eltern nur in der rechten Hälfte. */
+    .clip03-berenbach-person {
+      position: absolute;
+      bottom: 50%;
+      width: min(15vw, 245px);
+      height: min(39vh, 445px);
+      opacity: 0;
+      transform: translateX(-50%) translateY(2%) scale(.985);
+      transition:
+        opacity 850ms cubic-bezier(.2,.72,.25,1),
+        transform 850ms cubic-bezier(.2,.72,.25,1);
+      pointer-events: none;
+    }
+
+    .clip03-berenbach-person--johann { left: 62%; }
+    .clip03-berenbach-person--ottilie { left: 80%; }
+
+    .clip03-berenbach-person.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .clip03-berenbach-person.is-fading-out {
+      opacity: 0;
+      transform: translateX(-50%) translateY(1%) scale(.99);
+    }
+
+    .clip03-berenbach-image {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      display: block;
+      max-width: 100%;
+      max-height: 86%;
+      width: auto;
+      height: auto;
+      transform: translateX(-50%);
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 7px 12px rgba(0,0,0,.50));
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .clip03-berenbach-name {
+      position: absolute;
+      left: 50%;
+      bottom: 87%;
+      z-index: 2;
+      width: 132%;
+      transform: translateX(-50%);
+      text-align: center;
+      color: #fff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(11px, 1.1vw, 21px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: .025em;
+      text-shadow:
+        -2px -2px 0 #a47a24,
+         2px -2px 0 #a47a24,
+        -2px  2px 0 #a47a24,
+         2px  2px 0 #a47a24,
+         0 3px 6px rgba(0,0,0,.92);
+      white-space: normal;
+    }
+
+    /* Eheringe mittig zwischen den beiden Eltern, ebenfalls rechts. */
+    .clip03-berenbach-rings {
+      position: absolute;
+      left: 71%;
+      top: 30%;
+      z-index: 13;
+      width: clamp(78px, 7.2vw, 135px);
+      height: clamp(55px, 5.8vw, 108px);
+      transform: translate(-50%, -50%) scale(.86);
+      opacity: 0;
+      transition:
+        opacity 700ms cubic-bezier(.2,.72,.25,1),
+        transform 700ms cubic-bezier(.2,.72,.25,1);
+      filter: drop-shadow(0 4px 7px rgba(0,0,0,.62));
+    }
+
+    .clip03-berenbach-rings.is-visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .clip03-berenbach-rings.is-fading-out {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.94);
+    }
+
+    .clip03-berenbach-ring {
+      position: absolute;
+      top: 50%;
+      width: 50%;
+      aspect-ratio: 1;
+      border: clamp(5px, .5vw, 9px) solid #d6a83b;
+      border-radius: 50%;
+      box-sizing: border-box;
+      box-shadow:
+        inset 0 0 0 2px rgba(255,239,164,.68),
+        0 0 0 2px rgba(91,54,4,.72),
+        0 4px 8px rgba(0,0,0,.55);
+    }
+
+    .clip03-berenbach-ring--left {
+      left: 12%;
+      transform: translateY(-50%) rotate(-16deg);
+    }
+
+    .clip03-berenbach-ring--right {
+      right: 12%;
+      transform: translateY(-50%) rotate(16deg);
+    }
+
+    /* Untere Reihe: die beiden Söhne, weiterhin komplett rechts. */
+    .clip03-berenbach-child {
+      position: absolute;
+      bottom: 7%;
+      width: min(15vw, 245px);
+      height: min(39vh, 445px);
+      opacity: 0;
+      transform: translateX(-50%) translateY(2.5%) scale(.975);
+      transition:
+        opacity 850ms cubic-bezier(.2,.72,.25,1),
+        transform 850ms cubic-bezier(.2,.72,.25,1);
+      pointer-events: none;
+    }
+
+    .clip03-berenbach-child--buerkelin { left: 62%; }
+    .clip03-berenbach-child--johannes { left: 80%; }
+
+    .clip03-berenbach-child.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .clip03-berenbach-child.is-fading-out {
+      opacity: 0;
+      transform: translateX(-50%) translateY(1%) scale(.99);
+    }
+
+    .clip03-berenbach-child-image {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      display: block;
+      max-width: 100%;
+      max-height: 86%;
+      width: auto;
+      height: auto;
+      transform: translateX(-50%);
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 7px 12px rgba(0,0,0,.50));
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .clip03-berenbach-child-name {
+      position: absolute;
+      left: 50%;
+      bottom: 87%;
+      z-index: 2;
+      width: 132%;
+      transform: translateX(-50%);
+      text-align: center;
+      color: #fff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(11px, 1.05vw, 20px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: .025em;
+      text-shadow:
+        -2px -2px 0 #a47a24,
+         2px -2px 0 #a47a24,
+        -2px  2px 0 #a47a24,
+         2px  2px 0 #a47a24,
+         0 3px 6px rgba(0,0,0,.92);
+      white-space: normal;
+    }
+
     /* Frau bleibt exakt in der bisherigen linken sicheren Innenposition. */
     .clip03-woman {
       position: absolute;
@@ -889,6 +1117,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-family-fullpage-01"></script>
+  <script src="app.js?v=clip03-berenbach-family-01"></script>
 </body>
 </html>

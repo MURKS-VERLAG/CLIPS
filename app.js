@@ -29,6 +29,10 @@ const clip03NuwensteinChildren = [
   { src: "assets/clip03/adelheid-nuwenstein.webp", name: "Adelheid Nuwenstein" },
   { src: "assets/clip03/berthold-nuwenstein.webp", name: "Berthold Nuwenstein" }
 ];
+const clip03JohannBerenbachImage = "assets/clip03/johann-berenbach.webp";
+const clip03OttilieBerenbachImage = "assets/clip03/ottilie-nuwenstein-berenbach.webp";
+const clip03BuerkelinBerenbachImage = "assets/clip03/buerkelin-berenbach.webp";
+const clip03JohannesBerenbachImage = "assets/clip03/johannes-berenbach.webp";
 const clip03WomanRest = "assets/clip03/woman-rest.webp";
 const clip03WomanSingImages = [
   "assets/clip03/woman-sing-01.webp",
@@ -622,6 +626,73 @@ function hideClip03Child(card) {
   card.classList.add("is-fading-out");
 }
 
+
+function createClip03BerenbachFamilySequence(layer) {
+  const sequence = document.createElement("div");
+  sequence.className = "clip03-berenbach-family-sequence";
+
+  const houseTitle = document.createElement("div");
+  houseTitle.className = "clip03-berenbach-house-title";
+  houseTitle.textContent = "HAUS BERENBACH";
+
+  const johann = document.createElement("div");
+  johann.className = "clip03-berenbach-person clip03-berenbach-person--johann";
+  johann.innerHTML = `
+    <div class="clip03-berenbach-name">JOHANN BERENBACH</div>
+    <img class="clip03-berenbach-image" src="${clip03JohannBerenbachImage}" alt="" draggable="false">
+  `;
+
+  const ottilie = document.createElement("div");
+  ottilie.className = "clip03-berenbach-person clip03-berenbach-person--ottilie";
+  ottilie.innerHTML = `
+    <div class="clip03-berenbach-name">OTTILIE NUWENSTEIN</div>
+    <img class="clip03-berenbach-image" src="${clip03OttilieBerenbachImage}" alt="" draggable="false">
+  `;
+
+  const rings = document.createElement("div");
+  rings.className = "clip03-berenbach-rings";
+  rings.innerHTML = `
+    <span class="clip03-berenbach-ring clip03-berenbach-ring--left"></span>
+    <span class="clip03-berenbach-ring clip03-berenbach-ring--right"></span>
+  `;
+
+  const buerkelin = document.createElement("div");
+  buerkelin.className = "clip03-berenbach-child clip03-berenbach-child--buerkelin";
+  buerkelin.innerHTML = `
+    <div class="clip03-berenbach-child-name">BÜRKELIN BERENBACH</div>
+    <img class="clip03-berenbach-child-image" src="${clip03BuerkelinBerenbachImage}" alt="" draggable="false">
+  `;
+
+  const johannes = document.createElement("div");
+  johannes.className = "clip03-berenbach-child clip03-berenbach-child--johannes";
+  johannes.innerHTML = `
+    <div class="clip03-berenbach-child-name">JOHANNES BERENBACH</div>
+    <img class="clip03-berenbach-child-image" src="${clip03JohannesBerenbachImage}" alt="" draggable="false">
+  `;
+
+  sequence.appendChild(houseTitle);
+  sequence.appendChild(johann);
+  sequence.appendChild(ottilie);
+  sequence.appendChild(rings);
+  sequence.appendChild(buerkelin);
+  sequence.appendChild(johannes);
+  layer.appendChild(sequence);
+
+  return { sequence, houseTitle, johann, ottilie, rings, buerkelin, johannes };
+}
+
+function showClip03BerenbachElement(el) {
+  if (!el) return;
+  el.classList.remove("is-fading-out");
+  requestAnimationFrame(() => el.classList.add("is-visible"));
+}
+
+function hideClip03BerenbachElement(el) {
+  if (!el) return;
+  el.classList.remove("is-visible");
+  el.classList.add("is-fading-out");
+}
+
 function getClip03Woman(layer) {
   if (!layer) return null;
 
@@ -739,6 +810,7 @@ async function playClip03() {
   const castleSequence = createClip03CastleSequence(layer);
   const familySequence = createClip03NuwensteinFamilySequence(layer);
   const childrenSequence = createClip03ChildrenSequence(layer);
+  const berenbachFamily = createClip03BerenbachFamilySequence(layer);
 
   // Clip-03-Bilder vorladen, damit alle Einblendungen sauber bleiben.
   [
@@ -748,6 +820,10 @@ async function playClip03() {
     clip03HansNuwensteinImage,
     clip03AnnaNuwensteinImage,
     ...clip03NuwensteinChildren.map((child) => child.src),
+    clip03JohannBerenbachImage,
+    clip03OttilieBerenbachImage,
+    clip03BuerkelinBerenbachImage,
+    clip03JohannesBerenbachImage,
     clip03WomanRest,
     ...clip03WomanSingImages
   ].forEach((src) => {
@@ -772,6 +848,7 @@ async function playClip03() {
   let castleTitlePhase = "before12";
   let familyPhase = "before24";
   let childrenShown = 0;
+  let berenbachPhase = "before43";
 
   const tick = () => {
     if (token !== clip03RunToken) return;
@@ -883,6 +960,62 @@ async function playClip03() {
       hideClip03FamilyElement(familySequence.anna);
       hideClip03FamilyElement(familySequence.rings);
       childrenSequence.entries.forEach(hideClip03Child);
+    }
+
+
+    /*
+      HAUS BERENBACH – gleiche Rhythmik wie zuvor, jetzt rechts neben der Sängerin:
+      43–45 s Haus-Titel
+      46 s Johann
+      47 s Ottilie
+      48 s Eheringe
+      49 s Bürkelin
+      50 s Johannes
+      50–53 s komplette Familie gemeinsam
+      ab 53 s gemeinsamer Smooth-Fade
+    */
+    if (t >= 43 && t < 45 && berenbachPhase === "before43") {
+      berenbachPhase = "house-title";
+      showClip03BerenbachElement(berenbachFamily.houseTitle);
+    }
+
+    if (t >= 45 && t < 46 && berenbachPhase === "house-title") {
+      berenbachPhase = "house-title-out";
+      hideClip03BerenbachElement(berenbachFamily.houseTitle);
+    }
+
+    if (t >= 46 && t < 47 && berenbachPhase === "house-title-out") {
+      berenbachPhase = "johann";
+      showClip03BerenbachElement(berenbachFamily.johann);
+    }
+
+    if (t >= 47 && t < 48 && berenbachPhase === "johann") {
+      berenbachPhase = "ottilie";
+      showClip03BerenbachElement(berenbachFamily.ottilie);
+    }
+
+    if (t >= 48 && t < 49 && berenbachPhase === "ottilie") {
+      berenbachPhase = "rings";
+      showClip03BerenbachElement(berenbachFamily.rings);
+    }
+
+    if (t >= 49 && t < 50 && berenbachPhase === "rings") {
+      berenbachPhase = "buerkelin";
+      showClip03BerenbachElement(berenbachFamily.buerkelin);
+    }
+
+    if (t >= 50 && t < 53 && berenbachPhase === "buerkelin") {
+      berenbachPhase = "johannes";
+      showClip03BerenbachElement(berenbachFamily.johannes);
+    }
+
+    if (t >= 53 && berenbachPhase === "johannes") {
+      berenbachPhase = "done";
+      hideClip03BerenbachElement(berenbachFamily.johann);
+      hideClip03BerenbachElement(berenbachFamily.ottilie);
+      hideClip03BerenbachElement(berenbachFamily.rings);
+      hideClip03BerenbachElement(berenbachFamily.buerkelin);
+      hideClip03BerenbachElement(berenbachFamily.johannes);
     }
 
     if (t >= 12 && t < 20 && phase !== "sing12") {
