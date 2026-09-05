@@ -53,6 +53,10 @@ const clip03WomanEndImages = [
   "assets/clip03/woman-end-06.webp",
   "assets/clip03/woman-end-07.webp"
 ];
+const clip03DialogLeftImage01 = "assets/clip03/dialog-left-01-red.webp";
+const clip03DialogLeftImage02 = "assets/clip03/dialog-left-02-red-wave.webp";
+const clip03DialogRightImage01 = "assets/clip03/dialog-right-01-blue.webp";
+const clip03DialogRightImage02 = "assets/clip03/dialog-right-02-blue-wave.webp";
 
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
@@ -795,50 +799,99 @@ function startClip03Singing(layer, token, isAllowed) {
 function createClip03WomanWhitePuff(layer) {
   const puff = document.createElement("div");
   puff.className = "clip03-woman-white-puff";
-
-  // Organische, breite Rauchwolke exakt über der Sängerin.
-  // Jede Teilwolke bekommt eigene Position, Größe, Ton und Drift.
   const clouds = [
-    { x: 18, y: 22, s: 1.02, tone: "255,255,255", dx: -18, dy: -20, delay: 0 },
-    { x: 34, y: 16, s: .88, tone: "248,248,244", dx: -8,  dy: -28, delay: 40 },
-    { x: 50, y: 19, s: 1.16, tone: "255,253,247", dx: 4,   dy: -26, delay: 70 },
-    { x: 66, y: 15, s: .94, tone: "238,240,242", dx: 12,  dy: -24, delay: 25 },
-    { x: 80, y: 24, s: 1.08, tone: "255,255,255", dx: 20,  dy: -18, delay: 90 },
-
-    { x: 12, y: 42, s: 1.12, tone: "246,246,242", dx: -24, dy: -8,  delay: 55 },
-    { x: 29, y: 39, s: 1.30, tone: "255,255,255", dx: -12, dy: -12, delay: 10 },
-    { x: 48, y: 38, s: 1.42, tone: "250,249,244", dx: 0,   dy: -14, delay: 80 },
-    { x: 67, y: 40, s: 1.26, tone: "235,238,240", dx: 14,  dy: -10, delay: 35 },
-    { x: 86, y: 43, s: 1.10, tone: "255,255,255", dx: 26,  dy: -6,  delay: 105 },
-
-    { x: 17, y: 62, s: 1.04, tone: "241,242,240", dx: -20, dy: 6,   delay: 95 },
-    { x: 35, y: 59, s: 1.28, tone: "255,255,252", dx: -8,  dy: 2,   delay: 20 },
-    { x: 53, y: 60, s: 1.38, tone: "245,245,241", dx: 5,   dy: 0,   delay: 65 },
-    { x: 72, y: 61, s: 1.20, tone: "255,255,255", dx: 16,  dy: 4,   delay: 45 },
-    { x: 88, y: 66, s: .98, tone: "232,235,237", dx: 24,  dy: 10,  delay: 115 },
-
-    { x: 26, y: 80, s: .94, tone: "255,255,255", dx: -12, dy: 18,  delay: 30 },
-    { x: 45, y: 78, s: 1.12, tone: "240,242,242", dx: 0,   dy: 16,  delay: 100 },
-    { x: 65, y: 79, s: 1.06, tone: "253,252,247", dx: 12,  dy: 18,  delay: 60 },
-    { x: 80, y: 84, s: .88, tone: "235,238,240", dx: 22,  dy: 22,  delay: 125 }
+    {x:14,y:20,s:1.02,t:"255,255,255",dx:-14,dy:-18,d:0},
+    {x:32,y:15,s:.90,t:"245,246,244",dx:-7,dy:-24,d:55},
+    {x:50,y:19,s:1.18,t:"255,253,247",dx:3,dy:-22,d:95},
+    {x:68,y:16,s:.96,t:"236,239,241",dx:10,dy:-20,d:35},
+    {x:84,y:24,s:1.06,t:"255,255,255",dx:16,dy:-14,d:120},
+    {x:11,y:43,s:1.14,t:"248,248,244",dx:-18,dy:-7,d:80},
+    {x:29,y:39,s:1.30,t:"255,255,255",dx:-9,dy:-10,d:20},
+    {x:49,y:40,s:1.44,t:"250,249,244",dx:0,dy:-10,d:110},
+    {x:69,y:40,s:1.28,t:"234,238,240",dx:10,dy:-7,d:45},
+    {x:88,y:45,s:1.08,t:"255,255,255",dx:19,dy:-3,d:135},
+    {x:18,y:65,s:1.08,t:"240,242,240",dx:-14,dy:7,d:105},
+    {x:38,y:61,s:1.28,t:"255,255,252",dx:-5,dy:4,d:35},
+    {x:59,y:62,s:1.36,t:"245,245,241",dx:6,dy:5,d:90},
+    {x:79,y:66,s:1.14,t:"255,255,255",dx:15,dy:10,d:60},
+    {x:31,y:83,s:.98,t:"252,252,250",dx:-7,dy:17,d:65},
+    {x:55,y:81,s:1.12,t:"238,241,242",dx:4,dy:18,d:125},
+    {x:77,y:84,s:.94,t:"255,253,248",dx:14,dy:20,d:85}
   ];
-
-  clouds.forEach((config, index) => {
+  clouds.forEach(c => {
     const cloud = document.createElement("span");
     cloud.className = "clip03-woman-white-puff__cloud";
-    cloud.style.setProperty("--px", `${config.x}%`);
-    cloud.style.setProperty("--py", `${config.y}%`);
-    cloud.style.setProperty("--ps", String(config.s));
-    cloud.style.setProperty("--tone", config.tone);
-    cloud.style.setProperty("--dx", `${config.dx}px`);
-    cloud.style.setProperty("--dy", `${config.dy}px`);
-    cloud.style.setProperty("--delay", `${config.delay}ms`);
-    cloud.style.setProperty("--puff-index", String(index));
+    cloud.style.setProperty("--px", `${c.x}%`);
+    cloud.style.setProperty("--py", `${c.y}%`);
+    cloud.style.setProperty("--ps", c.s);
+    cloud.style.setProperty("--tone", c.t);
+    cloud.style.setProperty("--dx", `${c.dx}px`);
+    cloud.style.setProperty("--dy", `${c.dy}px`);
+    cloud.style.setProperty("--delay", `${c.d}ms`);
     puff.appendChild(cloud);
   });
-
   layer.appendChild(puff);
   return puff;
+}
+
+function createClip03QuestionMark(layer) {
+  const mark = document.createElement("div");
+  mark.className = "clip03-question-mark";
+  mark.textContent = "?";
+  layer.appendChild(mark);
+  requestAnimationFrame(() => mark.classList.add("is-visible"));
+  return mark;
+}
+
+function createClip03PostPuffDialogue(layer) {
+  const scene = document.createElement("div");
+  scene.className = "clip03-post-dialogue";
+  const left = document.createElement("div");
+  left.className = "clip03-dialog-character clip03-dialog-character--left";
+  left.innerHTML = `<img src="${clip03DialogLeftImage01}" alt="" draggable="false">`;
+  const right = document.createElement("div");
+  right.className = "clip03-dialog-character clip03-dialog-character--right";
+  right.innerHTML = `<img src="${clip03DialogRightImage01}" alt="" draggable="false">`;
+  const leftBubble = document.createElement("div");
+  leftBubble.className = "clip03-dialog-bubble clip03-dialog-bubble--left";
+  leftBubble.textContent = "GRÜß GOTT JOHANN!";
+  const rightBubble = document.createElement("div");
+  rightBubble.className = "clip03-dialog-bubble clip03-dialog-bubble--right";
+  rightBubble.textContent = "TAG JOHANN!";
+  scene.append(left,right,leftBubble,rightBubble);
+  layer.appendChild(scene);
+  return {left,right,leftBubble,rightBubble};
+}
+
+function setClip03DialogImage(entry, src) {
+  const img = entry?.querySelector("img");
+  if (img) img.src = src;
+}
+function showClip03DialogElement(el) {
+  if (!el) return;
+  el.classList.remove("is-fading-out");
+  requestAnimationFrame(() => el.classList.add("is-visible"));
+}
+function hideClip03DialogElement(el) {
+  if (!el) return;
+  el.classList.remove("is-visible");
+  el.classList.add("is-fading-out");
+}
+
+async function playClip03PostPuffDialogue(layer, token) {
+  if (token !== clip03RunToken) return;
+  const d = createClip03PostPuffDialogue(layer);
+  showClip03DialogElement(d.left);
+  if (!(await waitClip03(2000, token))) return;
+  showClip03DialogElement(d.right);
+  if (!(await waitClip03(4000, token))) return;
+  setClip03DialogImage(d.right, clip03DialogRightImage02);
+  showClip03DialogElement(d.rightBubble);
+  if (!(await waitClip03(2000, token))) return;
+  setClip03DialogImage(d.left, clip03DialogLeftImage02);
+  showClip03DialogElement(d.leftBubble);
+  if (!(await waitClip03(1000, token))) return;
+  hideClip03DialogElement(d.rightBubble);
 }
 
 function playClip03WomanEndSequence(layer, token) {
@@ -874,29 +927,34 @@ function playClip03WomanEndSequence(layer, token) {
   });
 }
 
-async function finishClip03WomanWithPuff(layer, token) {
+async function finishClip03WomanWithPuff(layer, token, questionMark = null) {
   if (token !== clip03RunToken) return;
-
   const woman = layer?.querySelector(".clip03-woman");
   const puff = createClip03WomanWhitePuff(layer);
 
-  requestAnimationFrame(() => {
-    if (token !== clip03RunToken) return;
-    puff.classList.add("is-active");
-    if (woman) {
-      woman.classList.remove("is-visible");
-      woman.classList.add("is-puffing-out");
-    }
-  });
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (token !== clip03RunToken) return;
 
-  if (!(await waitClip03(1000, token))) return;
+  puff.classList.add("is-active");
+  if (woman) {
+    woman.classList.remove("is-visible");
+    woman.classList.add("is-puffing-out");
+  }
 
+  if (!(await waitClip03(1600, token))) return;
   puff.classList.add("is-ending");
+  if (questionMark) {
+    questionMark.classList.remove("is-visible");
+    questionMark.classList.add("is-fading-out");
+  }
 
-  if (!(await waitClip03(900, token))) return;
+  if (!(await waitClip03(1250, token))) return;
 
   puff.remove();
   if (woman) woman.remove();
+  if (questionMark) questionMark.remove();
+
+  playClip03PostPuffDialogue(layer, token);
 }
 
 async function playClip03() {
@@ -943,7 +1001,11 @@ async function playClip03() {
     clip03JohannesBerenbachImage,
     clip03WomanRest,
     ...clip03WomanSingImages,
-    ...clip03WomanEndImages
+    ...clip03WomanEndImages,
+    clip03DialogLeftImage01,
+    clip03DialogLeftImage02,
+    clip03DialogRightImage01,
+    clip03DialogRightImage02
   ].forEach((src) => {
     const preload = new Image();
     preload.src = src;
@@ -1154,9 +1216,11 @@ async function playClip03() {
         clip03Soundtrack.pause();
       } catch (_) {}
 
+      const questionMark = createClip03QuestionMark(layer);
+
       playClip03WomanEndSequence(layer, token).then((completed) => {
         if (!completed || token !== clip03RunToken) return;
-        finishClip03WomanWithPuff(layer, token);
+        finishClip03WomanWithPuff(layer, token, questionMark);
       });
 
       return;

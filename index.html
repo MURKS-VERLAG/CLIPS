@@ -1032,112 +1032,78 @@
     }
 
 
-    /* Clip 03: breiter, organischer weißer Rauch-Puff DIREKT über der Sängerin. */
+    /* Clip 03: extra smoother Rauch-Puff, nur transform/opacity animiert. */
     .clip03-woman-white-puff {
-      position: absolute;
-      left: 22%;
-      bottom: 4.5%;
-      z-index: 20;
-      width: min(46vw, 760px);
-      height: min(80vh, 860px);
-      transform: translateX(-50%) scale(.82);
-      transform-origin: center center;
-      opacity: 0;
-      pointer-events: none;
-      overflow: visible;
-      filter: blur(.35px);
+      position:absolute; left:22%; bottom:3%; z-index:20;
+      width:min(49vw,800px); height:min(82vh,880px);
+      transform:translate3d(-50%,0,0) scale(.86);
+      transform-origin:center; opacity:0; pointer-events:none; overflow:visible;
+      will-change:opacity,transform; backface-visibility:hidden;
     }
-
     .clip03-woman-white-puff.is-active {
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
-      transition:
-        opacity 240ms ease-out,
-        transform 520ms cubic-bezier(.2,.72,.25,1);
+      opacity:1; transform:translate3d(-50%,0,0) scale(1);
+      transition:opacity 520ms cubic-bezier(.16,.72,.25,1),transform 900ms cubic-bezier(.16,.72,.25,1);
     }
-
     .clip03-woman-white-puff.is-ending {
-      opacity: 0;
-      transform: translateX(-50%) scale(1.12);
-      transition:
-        opacity 900ms cubic-bezier(.4,0,1,1),
-        transform 900ms ease-out;
+      opacity:0; transform:translate3d(-50%,-1.5%,0) scale(1.10);
+      transition:opacity 1250ms cubic-bezier(.22,.61,.36,1),transform 1250ms cubic-bezier(.22,.61,.36,1);
     }
-
     .clip03-woman-white-puff__cloud {
-      position: absolute;
-      left: var(--px);
-      top: var(--py);
-      width: clamp(92px, 9vw, 175px);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      opacity: 0;
-      transform:
-        translate(-50%, -50%)
-        translate(0, 0)
-        scale(calc(.52 * var(--ps)));
-      background:
-        radial-gradient(
-          circle at 43% 40%,
-          rgba(var(--tone), .99) 0 26%,
-          rgba(var(--tone), .94) 38%,
-          rgba(var(--tone), .72) 53%,
-          rgba(var(--tone), .38) 65%,
-          transparent 78%
-        );
-      box-shadow:
-        inset -10px -10px 22px rgba(205,208,210,.16),
-        0 0 18px rgba(255,255,255,.18);
-      filter: blur(5px);
-      animation: clip03WomanPuffCloud 920ms cubic-bezier(.16,.72,.25,1) forwards;
-      animation-delay: var(--delay);
-      will-change: opacity, transform;
+      position:absolute; left:var(--px); top:var(--py);
+      width:clamp(105px,10vw,190px); aspect-ratio:1; border-radius:50%; opacity:0;
+      transform:translate3d(-50%,-50%,0) scale(calc(.58 * var(--ps)));
+      background:radial-gradient(circle at 42% 38%,rgba(var(--tone),.98) 0 24%,rgba(var(--tone),.90) 39%,rgba(var(--tone),.62) 56%,rgba(var(--tone),.26) 69%,transparent 82%);
+      animation:clip03WomanPuffCloud 1450ms cubic-bezier(.16,.72,.25,1) forwards;
+      animation-delay:var(--delay); will-change:opacity,transform; backface-visibility:hidden;
     }
-
-    /* Einige Wolken bleiben bewusst dichter / andere weicher – kein "weißer Balken". */
-    .clip03-woman-white-puff__cloud:nth-child(3n) {
-      filter: blur(8px);
-      opacity: .92;
-    }
-
-    .clip03-woman-white-puff__cloud:nth-child(4n) {
-      filter: blur(3px);
-    }
-
-    .clip03-woman-white-puff__cloud:nth-child(5n) {
-      width: clamp(110px, 11vw, 205px);
-    }
-
+    .clip03-woman-white-puff__cloud:nth-child(4n){width:clamp(125px,12vw,220px);}
     @keyframes clip03WomanPuffCloud {
-      0% {
-        opacity: 0;
-        transform:
-          translate(-50%, -50%)
-          translate(0, 0)
-          scale(calc(.42 * var(--ps)));
-      }
-      24% {
-        opacity: .98;
-        transform:
-          translate(-50%, -50%)
-          translate(calc(var(--dx) * .22), calc(var(--dy) * .22))
-          scale(calc(.80 * var(--ps)));
-      }
-      58% {
-        opacity: .96;
-        transform:
-          translate(-50%, -50%)
-          translate(calc(var(--dx) * .62), calc(var(--dy) * .62))
-          scale(calc(1.02 * var(--ps)));
-      }
-      100% {
-        opacity: .88;
-        transform:
-          translate(-50%, -50%)
-          translate(var(--dx), var(--dy))
-          scale(calc(1.18 * var(--ps)));
-      }
+      0%{opacity:0;transform:translate3d(-50%,-50%,0) scale(calc(.52 * var(--ps)));}
+      28%{opacity:.96;transform:translate3d(calc(-50% + var(--dx)*.20),calc(-50% + var(--dy)*.20),0) scale(calc(.84 * var(--ps)));}
+      66%{opacity:.94;transform:translate3d(calc(-50% + var(--dx)*.62),calc(-50% + var(--dy)*.62),0) scale(calc(1.02 * var(--ps)));}
+      100%{opacity:.88;transform:translate3d(calc(-50% + var(--dx)),calc(-50% + var(--dy)),0) scale(calc(1.14 * var(--ps)));}
     }
+
+    .clip03-question-mark {
+      position:absolute; left:72%; top:48%; z-index:19; width:min(28vw,430px);
+      transform:translate(-50%,-50%) scale(.88); opacity:0; text-align:center; color:#e6b834;
+      font-family:Georgia,"Times New Roman",serif; font-size:clamp(72px,12vw,210px); font-weight:900; line-height:1;
+      text-shadow:-4px -4px 0 #fff,4px -4px 0 #fff,-4px 4px 0 #fff,4px 4px 0 #fff,0 7px 14px rgba(0,0,0,.68);
+      transition:opacity 650ms cubic-bezier(.2,.72,.25,1),transform 650ms cubic-bezier(.2,.72,.25,1);
+      pointer-events:none;
+    }
+    .clip03-question-mark.is-visible{opacity:1;transform:translate(-50%,-50%) scale(1);}
+    .clip03-question-mark.is-fading-out{
+      opacity:0;transform:translate(-50%,-50%) scale(1.06);
+      transition:opacity 1250ms cubic-bezier(.22,.61,.36,1),transform 1250ms cubic-bezier(.22,.61,.36,1);
+    }
+
+    .clip03-post-dialogue{position:absolute;inset:0;z-index:22;pointer-events:none;}
+    .clip03-dialog-character{
+      position:absolute;bottom:7%;width:min(28vw,430px);height:min(72vh,760px);opacity:0;
+      transition:opacity 900ms cubic-bezier(.2,.72,.25,1),transform 900ms cubic-bezier(.2,.72,.25,1);
+    }
+    .clip03-dialog-character--left{left:20%;transform:translateX(-50%) translateY(2%) scale(.98);}
+    .clip03-dialog-character--right{left:80%;transform:translateX(-50%) translateY(2%) scaleX(-1) scale(.98);}
+    .clip03-dialog-character--left.is-visible{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
+    .clip03-dialog-character--right.is-visible{opacity:1;transform:translateX(-50%) translateY(0) scaleX(-1) scale(1);}
+    .clip03-dialog-character img{
+      position:absolute;left:50%;bottom:0;max-width:100%;max-height:100%;width:auto;height:auto;
+      transform:translateX(-50%);object-fit:contain;object-position:center bottom;
+      filter:drop-shadow(0 8px 15px rgba(0,0,0,.50));user-select:none;
+    }
+
+    .clip03-dialog-bubble{
+      position:absolute;z-index:25;max-width:min(26vw,390px);padding:.55em .8em;
+      border:3px solid #a47a24;border-radius:18px;background:rgba(255,255,255,.96);color:#111;opacity:0;
+      font-family:Georgia,"Times New Roman",serif;font-size:clamp(16px,1.7vw,31px);font-weight:800;line-height:1.08;text-align:center;
+      box-shadow:0 6px 14px rgba(0,0,0,.42);
+      transition:opacity 600ms cubic-bezier(.2,.72,.25,1),transform 600ms cubic-bezier(.2,.72,.25,1);
+    }
+    .clip03-dialog-bubble--left{left:27%;top:21%;transform:translate(-50%,8px) scale(.96);}
+    .clip03-dialog-bubble--right{left:73%;top:21%;transform:translate(-50%,8px) scale(.96);}
+    .clip03-dialog-bubble.is-visible{opacity:1;transform:translate(-50%,0) scale(1);}
+    .clip03-dialog-bubble.is-fading-out{opacity:0;transform:translate(-50%,-5px) scale(.98);}
 
     /* Frau bleibt exakt in der bisherigen linken sicheren Innenposition. */
     .clip03-woman {
@@ -1233,6 +1199,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-puff-minifix-02"></script>
+  <script src="app.js?v=clip03-dialog-after-puff-01"></script>
 </body>
 </html>
