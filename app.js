@@ -44,6 +44,15 @@ const clip03WomanSingImages = [
   "assets/clip03/woman-sing-07.webp",
   "assets/clip03/woman-sing-08.webp"
 ];
+const clip03WomanEndImages = [
+  "assets/clip03/woman-end-01.webp",
+  "assets/clip03/woman-end-02.webp",
+  "assets/clip03/woman-end-03.webp",
+  "assets/clip03/woman-end-04.webp",
+  "assets/clip03/woman-end-05.webp",
+  "assets/clip03/woman-end-06.webp",
+  "assets/clip03/woman-end-07.webp"
+];
 
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
@@ -782,6 +791,80 @@ function startClip03Singing(layer, token, isAllowed) {
   nextFrame();
 }
 
+
+function createClip03WomanWhitePuff(layer) {
+  const puff = document.createElement("div");
+  puff.className = "clip03-woman-white-puff";
+
+  for (let i = 0; i < 9; i += 1) {
+    const cloud = document.createElement("span");
+    cloud.className = "clip03-woman-white-puff__cloud";
+    cloud.style.setProperty("--puff-index", String(i));
+    puff.appendChild(cloud);
+  }
+
+  layer.appendChild(puff);
+  return puff;
+}
+
+function playClip03WomanEndSequence(layer, token) {
+  return new Promise((resolve) => {
+    const durations = [1000, 1500, 500, 800, 500, 500, 800];
+    let index = 0;
+
+    const next = () => {
+      if (token !== clip03RunToken) {
+        resolve(false);
+        return;
+      }
+
+      if (index >= clip03WomanEndImages.length) {
+        resolve(true);
+        return;
+      }
+
+      showClip03Woman(layer, clip03WomanEndImages[index], false);
+
+      const duration = durations[index];
+      index += 1;
+
+      const timer = setTimeout(() => {
+        clip03Timers.delete(timer);
+        next();
+      }, duration);
+
+      clip03Timers.add(timer);
+    };
+
+    next();
+  });
+}
+
+async function finishClip03WomanWithPuff(layer, token) {
+  if (token !== clip03RunToken) return;
+
+  const woman = layer?.querySelector(".clip03-woman");
+  const puff = createClip03WomanWhitePuff(layer);
+
+  requestAnimationFrame(() => {
+    if (token !== clip03RunToken) return;
+    puff.classList.add("is-active");
+    if (woman) {
+      woman.classList.remove("is-visible");
+      woman.classList.add("is-puffing-out");
+    }
+  });
+
+  if (!(await waitClip03(1000, token))) return;
+
+  puff.classList.add("is-ending");
+
+  if (!(await waitClip03(900, token))) return;
+
+  puff.remove();
+  if (woman) woman.remove();
+}
+
 async function playClip03() {
   stopClip03Animation();
   const token = clip03RunToken;
@@ -825,7 +908,8 @@ async function playClip03() {
     clip03BuerkelinBerenbachImage,
     clip03JohannesBerenbachImage,
     clip03WomanRest,
-    ...clip03WomanSingImages
+    ...clip03WomanSingImages,
+    ...clip03WomanEndImages
   ].forEach((src) => {
     const preload = new Image();
     preload.src = src;
@@ -849,6 +933,7 @@ async function playClip03() {
   let familyPhase = "before24";
   let childrenShown = 0;
   let berenbachPhase = "before43";
+  let womanEndStarted = false;
 
   const tick = () => {
     if (token !== clip03RunToken) return;
@@ -1018,6 +1103,31 @@ async function playClip03() {
       hideClip03BerenbachElement(berenbachFamily.johannes);
     }
 
+
+    /*
+      Neue Endsequenz der Sängerin:
+      Berenbach ist ab 53 s raus.
+      2 Sekunden später (55 s) Musik abrupt STOP.
+      Danach 7 feste Reaktionsbilder in exakten Dauern,
+      anschließend großer weißer Rauch-Puff.
+    */
+    if (t >= 55 && !womanEndStarted) {
+      womanEndStarted = true;
+      phase = "woman-end";
+      singingRun += 1;
+
+      try {
+        clip03Soundtrack.pause();
+      } catch (_) {}
+
+      playClip03WomanEndSequence(layer, token).then((completed) => {
+        if (!completed || token !== clip03RunToken) return;
+        finishClip03WomanWithPuff(layer, token);
+      });
+
+      return;
+    }
+
     if (t >= 12 && t < 20 && phase !== "sing12") {
       phase = "sing12";
       singingRun += 1;
@@ -1062,18 +1172,7 @@ async function playClip03() {
       );
     }
 
-    if (t >= 80 && t < 82 && phase !== "rest80") {
-      phase = "rest80";
-      singingRun += 1;
-      showClip03Woman(layer, clip03WomanRest, false);
-    }
-
-    if (t >= 82 && phase === "rest80") {
-      phase = "done82";
-      hideClip03Woman(layer);
-    }
-
-    if (!clip03Soundtrack.ended) {
+    if (!womanEndStarted && !clip03Soundtrack.ended) {
       const timer = setTimeout(() => {
         clip03Timers.delete(timer);
         tick();

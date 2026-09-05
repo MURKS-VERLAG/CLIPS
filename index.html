@@ -1031,6 +1031,72 @@
       white-space: normal;
     }
 
+
+    /* Clip 03: großer weißer Rauch-Puff für das Verschwinden der Sängerin. */
+    .clip03-woman-white-puff {
+      position: absolute;
+      left: 22%;
+      bottom: 6%;
+      z-index: 20;
+      width: min(34vw, 560px);
+      height: min(72vh, 760px);
+      transform: translateX(-50%) scale(.72);
+      opacity: 0;
+      pointer-events: none;
+      filter: blur(1px);
+    }
+
+    .clip03-woman-white-puff.is-active {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+      transition:
+        opacity 260ms ease-out,
+        transform 520ms cubic-bezier(.2,.72,.25,1);
+    }
+
+    .clip03-woman-white-puff.is-ending {
+      opacity: 0;
+      transform: translateX(-50%) scale(1.16);
+      transition:
+        opacity 900ms cubic-bezier(.4,0,1,1),
+        transform 900ms ease-out;
+    }
+
+    .clip03-woman-white-puff__cloud {
+      position: absolute;
+      left: calc(22% + (var(--puff-index) % 3) * 28%);
+      top: calc(8% + (var(--puff-index) / 3) * 24%);
+      width: 42%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle,
+          rgba(255,255,255,.98) 0 34%,
+          rgba(244,244,244,.90) 48%,
+          rgba(225,225,225,.64) 62%,
+          transparent 78%);
+      filter: blur(8px);
+      opacity: .96;
+      transform: translate(-50%, -50%) scale(.72);
+      animation: clip03WomanPuffCloud 900ms ease-out forwards;
+      animation-delay: calc(var(--puff-index) * 35ms);
+    }
+
+    @keyframes clip03WomanPuffCloud {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.45);
+      }
+      35% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(.95);
+      }
+      100% {
+        opacity: .9;
+        transform: translate(-50%, -50%) scale(1.26);
+      }
+    }
+
     /* Frau bleibt exakt in der bisherigen linken sicheren Innenposition. */
     .clip03-woman {
       position: absolute;
@@ -1054,6 +1120,14 @@
     /* Singbildwechsel selbst: KEIN Crossfade. */
     .clip03-woman.is-visible {
       opacity: 1;
+    }
+
+    .clip03-woman.is-puffing-out {
+      opacity: 0;
+      transform: translate(-50%, 0) scale(.94);
+      transition:
+        opacity 260ms ease-out,
+        transform 420ms ease-out;
     }
 
     /* Nur die ausdrücklich gewünschten Ein-/Ausblendungen bei 12, 22 und 43 Sekunden. */
@@ -1117,6 +1191,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-berenbach-family-01"></script>
+  <script src="app.js?v=clip03-woman-endsequence-01"></script>
 </body>
 </html>
