@@ -616,6 +616,12 @@ function showClip03Child(card) {
   requestAnimationFrame(() => card.classList.add("is-visible"));
 }
 
+function hideClip03Child(card) {
+  if (!card) return;
+  card.classList.remove("is-visible");
+  card.classList.add("is-fading-out");
+}
+
 function getClip03Woman(layer) {
   if (!layer) return null;
 
@@ -849,18 +855,16 @@ async function playClip03() {
     }
 
     if (t >= 32 && familyPhase === "rings") {
-      familyPhase = "done";
-      hideClip03FamilyElement(familySequence.hans);
-      hideClip03FamilyElement(familySequence.anna);
-      hideClip03FamilyElement(familySequence.rings);
+      // Eltern + Eheringe bleiben bewusst stehen, während die Kinder dazukommen.
+      familyPhase = "holding-with-children";
     }
 
 
     /*
       Kinderfolge:
-      Eltern ab 32 s ausgeblendet.
-      32–33 s bewusste Pause.
       Ab 33 s jede Sekunde ein weiteres Kind von links nach rechts.
+      Eltern + Eheringe bleiben sichtbar.
+      Nach dem letzten Kind bleibt die komplette Familie 3 Sekunden stehen.
     */
     while (
       childrenShown < childrenSequence.entries.length &&
@@ -868,6 +872,17 @@ async function playClip03() {
     ) {
       showClip03Child(childrenSequence.entries[childrenShown]);
       childrenShown += 1;
+    }
+
+
+    // Letztes Kind erscheint bei 38 s. Danach bleibt die komplette Familie 3 s stehen.
+    // Ab 42 s fadet alles gemeinsam smooth aus.
+    if (t >= 42 && familyPhase === "holding-with-children") {
+      familyPhase = "family-done";
+      hideClip03FamilyElement(familySequence.hans);
+      hideClip03FamilyElement(familySequence.anna);
+      hideClip03FamilyElement(familySequence.rings);
+      childrenSequence.entries.forEach(hideClip03Child);
     }
 
     if (t >= 12 && t < 20 && phase !== "sing12") {
@@ -914,10 +929,15 @@ async function playClip03() {
       );
     }
 
-    if (t >= 80 && phase !== "rest80") {
+    if (t >= 80 && t < 82 && phase !== "rest80") {
       phase = "rest80";
       singingRun += 1;
       showClip03Woman(layer, clip03WomanRest, false);
+    }
+
+    if (t >= 82 && phase === "rest80") {
+      phase = "done82";
+      hideClip03Woman(layer);
     }
 
     if (!clip03Soundtrack.ended) {

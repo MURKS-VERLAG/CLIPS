@@ -606,9 +606,9 @@
 
     .clip03-family-person {
       position: absolute;
-      bottom: 10%;
-      width: min(25vw, 390px);
-      height: min(59vh, 660px);
+      bottom: 49%;
+      width: min(19vw, 300px);
+      height: min(43vh, 490px);
       opacity: 0;
       transform: translateX(-50%) translateY(2%) scale(.985);
       transition:
@@ -617,8 +617,8 @@
       pointer-events: none;
     }
 
-    .clip03-family-person--hans { left: 40%; }
-    .clip03-family-person--anna { left: 60%; }
+    .clip03-family-person--hans { left: 41.5%; }
+    .clip03-family-person--anna { left: 58.5%; }
 
     .clip03-family-person.is-visible {
       opacity: 1;
@@ -648,9 +648,9 @@
 
     .clip03-family-name {
       position: absolute;
-      top: 12%;
+      top: 8%;
       z-index: 2;
-      width: min(18vw, 300px);
+      width: min(16vw, 260px);
       transform: none;
       text-align: center;
       color: #fff;
@@ -669,12 +669,12 @@
     }
 
     .clip03-family-person--hans .clip03-family-name {
-      right: calc(100% + 1.2vw);
+      right: calc(100% + .7vw);
       left: auto;
     }
 
     .clip03-family-person--anna .clip03-family-name {
-      left: calc(100% + 1.2vw);
+      left: calc(100% + .7vw);
       right: auto;
     }
 
@@ -682,7 +682,7 @@
     .clip03-marriage-rings {
       position: absolute;
       left: 50%;
-      top: 55%;
+      top: 31%;
       z-index: 12;
       width: clamp(120px, 12vw, 220px);
       height: clamp(78px, 8vw, 150px);
@@ -740,9 +740,9 @@
     .clip03-child-card {
       position: absolute;
       left: calc(12.5% + (var(--child-index) * 15%));
-      bottom: 11%;
+      bottom: 7%;
       width: min(13vw, 210px);
-      height: min(49vh, 560px);
+      height: min(41vh, 470px);
       opacity: 0;
       transform: translateX(-50%) translateY(2.5%) scale(.975);
       transition:
@@ -754,6 +754,11 @@
     .clip03-child-card.is-visible {
       opacity: 1;
       transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .clip03-child-card.is-fading-out {
+      opacity: 0;
+      transform: translateX(-50%) translateY(1%) scale(.99);
     }
 
     .clip03-child-image {
@@ -776,9 +781,10 @@
     .clip03-child-name {
       position: absolute;
       left: 50%;
-      top: 0;
+      bottom: 88.5%;
+      top: auto;
       z-index: 2;
-      width: 132%;
+      width: 118%;
       transform: translateX(-50%);
       text-align: center;
       color: #fff;
@@ -883,6 +889,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-nuwenstein-kinder-01"></script>
+  <script src="app.js?v=clip03-family-fullpage-01"></script>
 </body>
 </html>
