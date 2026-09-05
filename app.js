@@ -57,6 +57,15 @@ const clip03DialogLeftImage01 = "assets/clip03/dialog-left-01-red.webp";
 const clip03DialogLeftImage02 = "assets/clip03/dialog-left-02-red-wave.webp";
 const clip03DialogRightImage01 = "assets/clip03/dialog-right-01-blue.webp";
 const clip03DialogRightImage02 = "assets/clip03/dialog-right-02-blue-wave.webp";
+const clip03DialogCenterImage01 = "assets/clip03/dialog-center-01-judge.png";
+const clip03DialogLeftImage03 = "assets/clip03/dialog-left-03-shocked.png";
+const clip03DialogRightImage03 = "assets/clip03/dialog-right-03-shocked.png";
+const clip03DialogCenterImage02 = "assets/clip03/dialog-center-02-fist.png";
+const clip03DialogCenterImage03 = "assets/clip03/dialog-center-03-slam.png";
+const clip03DialogCenterImage04 = "assets/clip03/dialog-center-04-knight.png";
+const clip03DialogGoatImage01 = "assets/clip03/dialog-goat-01-tongue.png";
+const clip03DialogGoatImage02 = "assets/clip03/dialog-goat-02-front.png";
+const clip03DialogGoatImage03 = "assets/clip03/dialog-goat-03-blank.png";
 
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
@@ -846,52 +855,224 @@ function createClip03QuestionMark(layer) {
 function createClip03PostPuffDialogue(layer) {
   const scene = document.createElement("div");
   scene.className = "clip03-post-dialogue";
+
   const left = document.createElement("div");
   left.className = "clip03-dialog-character clip03-dialog-character--left";
   left.innerHTML = `<img src="${clip03DialogLeftImage01}" alt="" draggable="false">`;
+
   const right = document.createElement("div");
   right.className = "clip03-dialog-character clip03-dialog-character--right";
   right.innerHTML = `<img src="${clip03DialogRightImage01}" alt="" draggable="false">`;
+
   const leftBubble = document.createElement("div");
   leftBubble.className = "clip03-dialog-bubble clip03-dialog-bubble--left";
   leftBubble.textContent = "GRÜß GOTT JOHANN!";
+
   const rightBubble = document.createElement("div");
   rightBubble.className = "clip03-dialog-bubble clip03-dialog-bubble--right";
   rightBubble.textContent = "TAG JOHANN!";
-  scene.append(left,right,leftBubble,rightBubble);
+
+  const centerBubble = document.createElement("div");
+  centerBubble.className = "clip03-dialog-bubble clip03-dialog-bubble--center";
+  centerBubble.textContent = "ICH BIN AUCH JOHANN!!!";
+
+  const centerReveal = document.createElement("div");
+  centerReveal.className = "clip03-dialog-center-reveal";
+  const center = document.createElement("div");
+  center.className = "clip03-dialog-center-character";
+  center.innerHTML = `<img src="${clip03DialogCenterImage01}" alt="" draggable="false">`;
+  centerReveal.appendChild(center);
+
+  scene.append(left, right, leftBubble, rightBubble, centerBubble, centerReveal);
   layer.appendChild(scene);
-  return {left,right,leftBubble,rightBubble};
+  return {scene, left, right, leftBubble, rightBubble, centerBubble, centerReveal, center};
 }
 
 function setClip03DialogImage(entry, src) {
   const img = entry?.querySelector("img");
   if (img) img.src = src;
 }
+
 function showClip03DialogElement(el) {
   if (!el) return;
   el.classList.remove("is-fading-out");
   requestAnimationFrame(() => el.classList.add("is-visible"));
 }
+
 function hideClip03DialogElement(el) {
   if (!el) return;
   el.classList.remove("is-visible");
   el.classList.add("is-fading-out");
 }
 
+function getClip03TopGoat(layer) {
+  return Array.from(layer?.querySelectorAll(".clip03-symbol") || []).find(
+    img => img.getAttribute("src") === "assets/clip01/goat.png" ||
+           img.classList.contains("clip03-dialog-goat")
+  ) || null;
+}
+
+async function playClip03GoatReaction(layer, token) {
+  const goat = getClip03TopGoat(layer);
+  if (!goat || token !== clip03RunToken) return;
+
+  goat.classList.add("clip03-dialog-goat");
+  goat.classList.remove("is-mirrored");
+  goat.src = clip03DialogGoatImage01;
+
+  if (!(await waitClip03(800, token))) return;
+  goat.classList.add("is-mirrored");
+
+  if (!(await waitClip03(800, token))) return;
+  goat.classList.remove("is-mirrored");
+  goat.src = clip03DialogGoatImage02;
+
+  if (!(await waitClip03(2000, token))) return;
+  goat.src = clip03DialogGoatImage03;
+}
+
+function createClip03SidePuff(scene, side) {
+  const puff = document.createElement("div");
+  puff.className = `clip03-dialog-side-puff clip03-dialog-side-puff--${side}`;
+  const data = [
+    [13,22,1.02,"255,255,255",-14,-16,0],[34,16,.88,"246,247,245",-7,-20,55],
+    [55,19,1.16,"255,253,247",3,-19,90],[76,23,1.02,"238,241,242",12,-13,35],
+    [18,44,1.18,"250,250,247",-12,-7,75],[43,40,1.34,"255,255,255",-3,-8,20],
+    [67,42,1.26,"241,243,243",9,-5,105],[87,47,1.04,"255,255,252",16,-2,45],
+    [25,66,1.12,"242,244,243",-8,7,110],[51,63,1.32,"255,255,255",2,5,50],
+    [76,67,1.14,"238,241,243",11,9,85],[38,84,1.02,"255,253,248",-3,15,65],
+    [65,83,.98,"245,246,244",7,17,120]
+  ];
+
+  data.forEach(([x,y,s,t,dx,dy,d]) => {
+    const c = document.createElement("span");
+    c.className = "clip03-dialog-side-puff__cloud";
+    c.style.setProperty("--px", `${x}%`);
+    c.style.setProperty("--py", `${y}%`);
+    c.style.setProperty("--ps", String(s));
+    c.style.setProperty("--tone", t);
+    c.style.setProperty("--dx", `${dx}px`);
+    c.style.setProperty("--dy", `${dy}px`);
+    c.style.setProperty("--delay", `${d}ms`);
+    puff.appendChild(c);
+  });
+
+  scene.appendChild(puff);
+  return puff;
+}
+
+async function puffOutClip03DialogSides(d, token) {
+  const leftPuff = createClip03SidePuff(d.scene, "left");
+  const rightPuff = createClip03SidePuff(d.scene, "right");
+
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (token !== clip03RunToken) return false;
+
+  leftPuff.classList.add("is-active");
+  rightPuff.classList.add("is-active");
+  d.left.classList.add("is-puffing-out");
+  d.right.classList.add("is-puffing-out");
+  d.left.classList.remove("is-visible");
+  d.right.classList.remove("is-visible");
+
+  if (!(await waitClip03(1200, token))) return false;
+  leftPuff.classList.add("is-ending");
+  rightPuff.classList.add("is-ending");
+
+  if (!(await waitClip03(1000, token))) return false;
+  leftPuff.remove();
+  rightPuff.remove();
+  d.left.remove();
+  d.right.remove();
+  return true;
+}
+
+async function flickerClip03CenterWhileSidesDisappear(d, token) {
+  let running = true;
+  let showKnightNext = false;
+
+  const flicker = () => {
+    if (!running || token !== clip03RunToken) return;
+    setClip03DialogImage(
+      d.center,
+      showKnightNext ? clip03DialogCenterImage04 : clip03DialogCenterImage03
+    );
+    showKnightNext = !showKnightNext;
+
+    const timer = setTimeout(() => {
+      clip03Timers.delete(timer);
+      flicker();
+    }, 400);
+    clip03Timers.add(timer);
+  };
+
+  // Flackern startet direkt mit Anhang 6.
+  setClip03DialogImage(d.center, clip03DialogCenterImage04);
+  showKnightNext = false;
+  const first = setTimeout(() => {
+    clip03Timers.delete(first);
+    flicker();
+  }, 400);
+  clip03Timers.add(first);
+
+  const done = await puffOutClip03DialogSides(d, token);
+  running = false;
+  if (!done || token !== clip03RunToken) return;
+
+  // Sobald beide Außenfiguren und beide Puffs komplett verschwunden sind:
+  // Mittelcharakter zurück auf Anhang 1 und stehen lassen.
+  setClip03DialogImage(d.center, clip03DialogCenterImage01);
+}
+
 async function playClip03PostPuffDialogue(layer, token) {
   if (token !== clip03RunToken) return;
+
   const d = createClip03PostPuffDialogue(layer);
+
   showClip03DialogElement(d.left);
   if (!(await waitClip03(2000, token))) return;
+
   showClip03DialogElement(d.right);
   if (!(await waitClip03(4000, token))) return;
+
   setClip03DialogImage(d.right, clip03DialogRightImage02);
   showClip03DialogElement(d.rightBubble);
+
   if (!(await waitClip03(2000, token))) return;
+
   setClip03DialogImage(d.left, clip03DialogLeftImage02);
   showClip03DialogElement(d.leftBubble);
+
+  // Rechte Sprechblase insgesamt 3 Sekunden.
   if (!(await waitClip03(1000, token))) return;
   hideClip03DialogElement(d.rightBubble);
+
+  // Linke Sprechblase ab ihrem Erscheinen exakt 4 Sekunden.
+  if (!(await waitClip03(3000, token))) return;
+  hideClip03DialogElement(d.leftBubble);
+
+  // Danach: "ICH BIN AUCH JOHANN!!!" für 3 Sekunden.
+  showClip03DialogElement(d.centerBubble);
+  if (!(await waitClip03(3000, token))) return;
+  hideClip03DialogElement(d.centerBubble);
+
+  // Mitte fährt langsam hoch; gleichzeitig Außenfiguren reagieren und Ziege wechselt.
+  setClip03DialogImage(d.left, clip03DialogLeftImage03);
+  setClip03DialogImage(d.right, clip03DialogRightImage03);
+  showClip03DialogElement(d.centerReveal);
+  playClip03GoatReaction(layer, token);
+
+  if (!(await waitClip03(3600, token))) return;
+
+  // Mitte: 4 für 0,8 s, dann 5 für 0,8 s.
+  setClip03DialogImage(d.center, clip03DialogCenterImage02);
+  if (!(await waitClip03(800, token))) return;
+
+  setClip03DialogImage(d.center, clip03DialogCenterImage03);
+  if (!(await waitClip03(800, token))) return;
+
+  // Danach 5/6 im 0,4-s-Flackern; zeitgleich verschwinden links/rechts im weißen Puff.
+  await flickerClip03CenterWhileSidesDisappear(d, token);
 }
 
 function playClip03WomanEndSequence(layer, token) {
@@ -1005,7 +1186,16 @@ async function playClip03() {
     clip03DialogLeftImage01,
     clip03DialogLeftImage02,
     clip03DialogRightImage01,
-    clip03DialogRightImage02
+    clip03DialogRightImage02,
+    clip03DialogCenterImage01,
+    clip03DialogLeftImage03,
+    clip03DialogRightImage03,
+    clip03DialogCenterImage02,
+    clip03DialogCenterImage03,
+    clip03DialogCenterImage04,
+    clip03DialogGoatImage01,
+    clip03DialogGoatImage02,
+    clip03DialogGoatImage03
   ].forEach((src) => {
     const preload = new Image();
     preload.src = src;
