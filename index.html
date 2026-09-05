@@ -728,6 +728,75 @@
       transform: translateY(-50%) rotate(16deg);
     }
 
+
+    /* Clip 03: sechs Nuwenstein-Kinder, ab Sekunde 33 im 1-s-Takt von links nach rechts. */
+    .clip03-children-sequence {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .clip03-child-card {
+      position: absolute;
+      left: calc(12.5% + (var(--child-index) * 15%));
+      bottom: 11%;
+      width: min(13vw, 210px);
+      height: min(49vh, 560px);
+      opacity: 0;
+      transform: translateX(-50%) translateY(2.5%) scale(.975);
+      transition:
+        opacity 850ms cubic-bezier(.2,.72,.25,1),
+        transform 850ms cubic-bezier(.2,.72,.25,1);
+      pointer-events: none;
+    }
+
+    .clip03-child-card.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .clip03-child-image {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      display: block;
+      max-width: 100%;
+      max-height: 88%;
+      width: auto;
+      height: auto;
+      transform: translateX(-50%);
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 7px 12px rgba(0,0,0,.50));
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .clip03-child-name {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      z-index: 2;
+      width: 132%;
+      transform: translateX(-50%);
+      text-align: center;
+      color: #fff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(11px, 1.05vw, 20px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: .025em;
+      text-shadow:
+        -2px -2px 0 #a47a24,
+         2px -2px 0 #a47a24,
+        -2px  2px 0 #a47a24,
+         2px  2px 0 #a47a24,
+         0 3px 6px rgba(0,0,0,.92);
+      white-space: normal;
+      pointer-events: none;
+    }
+
     /* Frau bleibt exakt in der bisherigen linken sicheren Innenposition. */
     .clip03-woman {
       position: absolute;
@@ -814,6 +883,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-family-layout-minifix-01"></script>
+  <script src="app.js?v=clip03-nuwenstein-kinder-01"></script>
 </body>
 </html>

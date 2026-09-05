@@ -21,6 +21,14 @@ const clip03NuwensteinImage = "assets/clip03/nuwenstein.webp";
 const clip03BerenbachImage = "assets/clip03/berenbach.webp";
 const clip03HansNuwensteinImage = "assets/clip03/johann-hans-nuwenstein.webp";
 const clip03AnnaNuwensteinImage = "assets/clip03/anna-nuwenstein.webp";
+const clip03NuwensteinChildren = [
+  { src: "assets/clip03/heinrich-nuwenstein.webp", name: "Heinrich Nuwenstein" },
+  { src: "assets/clip03/johann-nuwenstein.webp", name: "Johann Nuwenstein" },
+  { src: "assets/clip03/ottilie-nuwenstein.webp", name: "Ottilie Nuwenstein" },
+  { src: "assets/clip03/nothburga-nuwenstein.webp", name: "Nothburga Nuwenstein" },
+  { src: "assets/clip03/adelheid-nuwenstein.webp", name: "Adelheid Nuwenstein" },
+  { src: "assets/clip03/berthold-nuwenstein.webp", name: "Berthold Nuwenstein" }
+];
 const clip03WomanRest = "assets/clip03/woman-rest.webp";
 const clip03WomanSingImages = [
   "assets/clip03/woman-sing-01.webp",
@@ -571,6 +579,43 @@ function hideClip03NuwensteinFamily(sequence) {
   [sequence.houseTitle, sequence.hans, sequence.anna, sequence.rings].forEach(hideClip03FamilyElement);
 }
 
+
+function createClip03ChildrenSequence(layer) {
+  const sequence = document.createElement("div");
+  sequence.className = "clip03-children-sequence";
+
+  const entries = clip03NuwensteinChildren.map((child, index) => {
+    const card = document.createElement("div");
+    card.className = "clip03-child-card";
+    card.style.setProperty("--child-index", String(index));
+
+    const name = document.createElement("div");
+    name.className = "clip03-child-name";
+    name.textContent = child.name;
+
+    const img = document.createElement("img");
+    img.className = "clip03-child-image";
+    img.src = child.src;
+    img.alt = "";
+    img.draggable = false;
+
+    card.appendChild(name);
+    card.appendChild(img);
+    sequence.appendChild(card);
+
+    return card;
+  });
+
+  layer.appendChild(sequence);
+  return { sequence, entries };
+}
+
+function showClip03Child(card) {
+  if (!card) return;
+  card.classList.remove("is-fading-out");
+  requestAnimationFrame(() => card.classList.add("is-visible"));
+}
+
 function getClip03Woman(layer) {
   if (!layer) return null;
 
@@ -687,6 +732,7 @@ async function playClip03() {
   const gedoesCard = createClip03GedoresCard(layer);
   const castleSequence = createClip03CastleSequence(layer);
   const familySequence = createClip03NuwensteinFamilySequence(layer);
+  const childrenSequence = createClip03ChildrenSequence(layer);
 
   // Clip-03-Bilder vorladen, damit alle Einblendungen sauber bleiben.
   [
@@ -695,6 +741,7 @@ async function playClip03() {
     clip03BerenbachImage,
     clip03HansNuwensteinImage,
     clip03AnnaNuwensteinImage,
+    ...clip03NuwensteinChildren.map((child) => child.src),
     clip03WomanRest,
     ...clip03WomanSingImages
   ].forEach((src) => {
@@ -718,6 +765,7 @@ async function playClip03() {
   let castlePhase = "before12";
   let castleTitlePhase = "before12";
   let familyPhase = "before24";
+  let childrenShown = 0;
 
   const tick = () => {
     if (token !== clip03RunToken) return;
@@ -805,6 +853,21 @@ async function playClip03() {
       hideClip03FamilyElement(familySequence.hans);
       hideClip03FamilyElement(familySequence.anna);
       hideClip03FamilyElement(familySequence.rings);
+    }
+
+
+    /*
+      Kinderfolge:
+      Eltern ab 32 s ausgeblendet.
+      32–33 s bewusste Pause.
+      Ab 33 s jede Sekunde ein weiteres Kind von links nach rechts.
+    */
+    while (
+      childrenShown < childrenSequence.entries.length &&
+      t >= 33 + childrenShown
+    ) {
+      showClip03Child(childrenSequence.entries[childrenShown]);
+      childrenShown += 1;
     }
 
     if (t >= 12 && t < 20 && phase !== "sing12") {
