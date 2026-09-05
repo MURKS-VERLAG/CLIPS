@@ -1075,8 +1075,8 @@ async function flickerClip03Center(d, layer, token) {
   }, 400);
   clip03Timers.add(first);
 
-  // Flackern endet jetzt 2 Sekunden früher: 5,2 Sekunden.
-  if (!(await waitClip03(5200, token))) {
+  // Flackern endet nochmals 1,6 Sekunden früher: jetzt 3,6 Sekunden.
+  if (!(await waitClip03(3600, token))) {
     running = false;
     return;
   }
