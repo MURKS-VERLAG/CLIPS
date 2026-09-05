@@ -796,12 +796,46 @@ function createClip03WomanWhitePuff(layer) {
   const puff = document.createElement("div");
   puff.className = "clip03-woman-white-puff";
 
-  for (let i = 0; i < 9; i += 1) {
+  // Organische, breite Rauchwolke exakt über der Sängerin.
+  // Jede Teilwolke bekommt eigene Position, Größe, Ton und Drift.
+  const clouds = [
+    { x: 18, y: 22, s: 1.02, tone: "255,255,255", dx: -18, dy: -20, delay: 0 },
+    { x: 34, y: 16, s: .88, tone: "248,248,244", dx: -8,  dy: -28, delay: 40 },
+    { x: 50, y: 19, s: 1.16, tone: "255,253,247", dx: 4,   dy: -26, delay: 70 },
+    { x: 66, y: 15, s: .94, tone: "238,240,242", dx: 12,  dy: -24, delay: 25 },
+    { x: 80, y: 24, s: 1.08, tone: "255,255,255", dx: 20,  dy: -18, delay: 90 },
+
+    { x: 12, y: 42, s: 1.12, tone: "246,246,242", dx: -24, dy: -8,  delay: 55 },
+    { x: 29, y: 39, s: 1.30, tone: "255,255,255", dx: -12, dy: -12, delay: 10 },
+    { x: 48, y: 38, s: 1.42, tone: "250,249,244", dx: 0,   dy: -14, delay: 80 },
+    { x: 67, y: 40, s: 1.26, tone: "235,238,240", dx: 14,  dy: -10, delay: 35 },
+    { x: 86, y: 43, s: 1.10, tone: "255,255,255", dx: 26,  dy: -6,  delay: 105 },
+
+    { x: 17, y: 62, s: 1.04, tone: "241,242,240", dx: -20, dy: 6,   delay: 95 },
+    { x: 35, y: 59, s: 1.28, tone: "255,255,252", dx: -8,  dy: 2,   delay: 20 },
+    { x: 53, y: 60, s: 1.38, tone: "245,245,241", dx: 5,   dy: 0,   delay: 65 },
+    { x: 72, y: 61, s: 1.20, tone: "255,255,255", dx: 16,  dy: 4,   delay: 45 },
+    { x: 88, y: 66, s: .98, tone: "232,235,237", dx: 24,  dy: 10,  delay: 115 },
+
+    { x: 26, y: 80, s: .94, tone: "255,255,255", dx: -12, dy: 18,  delay: 30 },
+    { x: 45, y: 78, s: 1.12, tone: "240,242,242", dx: 0,   dy: 16,  delay: 100 },
+    { x: 65, y: 79, s: 1.06, tone: "253,252,247", dx: 12,  dy: 18,  delay: 60 },
+    { x: 80, y: 84, s: .88, tone: "235,238,240", dx: 22,  dy: 22,  delay: 125 }
+  ];
+
+  clouds.forEach((config, index) => {
     const cloud = document.createElement("span");
     cloud.className = "clip03-woman-white-puff__cloud";
-    cloud.style.setProperty("--puff-index", String(i));
+    cloud.style.setProperty("--px", `${config.x}%`);
+    cloud.style.setProperty("--py", `${config.y}%`);
+    cloud.style.setProperty("--ps", String(config.s));
+    cloud.style.setProperty("--tone", config.tone);
+    cloud.style.setProperty("--dx", `${config.dx}px`);
+    cloud.style.setProperty("--dy", `${config.dy}px`);
+    cloud.style.setProperty("--delay", `${config.delay}ms`);
+    cloud.style.setProperty("--puff-index", String(index));
     puff.appendChild(cloud);
-  }
+  });
 
   layer.appendChild(puff);
   return puff;
