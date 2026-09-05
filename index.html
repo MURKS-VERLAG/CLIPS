@@ -1032,38 +1032,6 @@
     }
 
 
-    /* Clip 03: extra smoother Rauch-Puff, nur transform/opacity animiert. */
-    .clip03-woman-white-puff {
-      position:absolute; left:22%; bottom:3%; z-index:20;
-      width:min(49vw,800px); height:min(82vh,880px);
-      transform:translate3d(-50%,0,0) scale(.86);
-      transform-origin:center; opacity:0; pointer-events:none; overflow:visible;
-      will-change:opacity,transform; backface-visibility:hidden;
-    }
-    .clip03-woman-white-puff.is-active {
-      opacity:1; transform:translate3d(-50%,0,0) scale(1);
-      transition:opacity 520ms cubic-bezier(.16,.72,.25,1),transform 900ms cubic-bezier(.16,.72,.25,1);
-    }
-    .clip03-woman-white-puff.is-ending {
-      opacity:0; transform:translate3d(-50%,-1.5%,0) scale(1.10);
-      transition:opacity 1250ms cubic-bezier(.22,.61,.36,1),transform 1250ms cubic-bezier(.22,.61,.36,1);
-    }
-    .clip03-woman-white-puff__cloud {
-      position:absolute; left:var(--px); top:var(--py);
-      width:clamp(105px,10vw,190px); aspect-ratio:1; border-radius:50%; opacity:0;
-      transform:translate3d(-50%,-50%,0) scale(calc(.58 * var(--ps)));
-      background:radial-gradient(circle at 42% 38%,rgba(var(--tone),.98) 0 24%,rgba(var(--tone),.90) 39%,rgba(var(--tone),.62) 56%,rgba(var(--tone),.26) 69%,transparent 82%);
-      animation:clip03WomanPuffCloud 1450ms cubic-bezier(.16,.72,.25,1) forwards;
-      animation-delay:var(--delay); will-change:opacity,transform; backface-visibility:hidden;
-    }
-    .clip03-woman-white-puff__cloud:nth-child(4n){width:clamp(125px,12vw,220px);}
-    @keyframes clip03WomanPuffCloud {
-      0%{opacity:0;transform:translate3d(-50%,-50%,0) scale(calc(.52 * var(--ps)));}
-      28%{opacity:.96;transform:translate3d(calc(-50% + var(--dx)*.20),calc(-50% + var(--dy)*.20),0) scale(calc(.84 * var(--ps)));}
-      66%{opacity:.94;transform:translate3d(calc(-50% + var(--dx)*.62),calc(-50% + var(--dy)*.62),0) scale(calc(1.02 * var(--ps)));}
-      100%{opacity:.88;transform:translate3d(calc(-50% + var(--dx)),calc(-50% + var(--dy)),0) scale(calc(1.14 * var(--ps)));}
-    }
-
     .clip03-question-mark {
       position:absolute; left:72%; top:48%; z-index:19; width:min(28vw,430px);
       transform:translate(-50%,-50%) scale(.88); opacity:0; text-align:center; color:#e6b834;
@@ -1120,7 +1088,7 @@
     .clip03-dialog-center-character{
       position:absolute;left:50%;bottom:0;width:100%;height:100%;
       transform:translate3d(-50%,105%,0);
-      transition:transform 3600ms cubic-bezier(.18,.72,.22,1);
+      transition:transform 7000ms cubic-bezier(.18,.72,.22,1);
       will-change:transform;
     }
     .clip03-dialog-center-reveal.is-visible .clip03-dialog-center-character{
@@ -1132,43 +1100,111 @@
       filter:drop-shadow(0 8px 15px rgba(0,0,0,.52));user-select:none;pointer-events:none;
     }
 
-    .clip03-dialog-character.is-puffing-out{
-      opacity:0;transition:opacity 420ms cubic-bezier(.2,.72,.25,1),transform 700ms cubic-bezier(.2,.72,.25,1);
+    /* Clip 03: Figuren verschwinden weich; danach großer Zigarettenrauch wie bei Clip 02. */
+    .clip03-dialog-character.is-smoke-fading-out{
+      opacity:0;
+      transition:opacity 1100ms cubic-bezier(.22,.61,.36,1),transform 1100ms cubic-bezier(.22,.61,.36,1);
     }
-    .clip03-dialog-character--left.is-puffing-out{
-      transform:translateX(-50%) translateY(-1%) scale(.95);
+    .clip03-dialog-character--left.is-smoke-fading-out{
+      transform:translateX(-50%) translateY(-1%) scale(.98);
     }
-    .clip03-dialog-character--right.is-puffing-out{
-      transform:translateX(-50%) translateY(-1%) scaleX(-1) scale(.95);
+    .clip03-dialog-character--right.is-smoke-fading-out{
+      transform:translateX(-50%) translateY(-1%) scaleX(-1) scale(.98);
     }
 
-    .clip03-dialog-side-puff{
-      position:absolute;bottom:4.5%;z-index:30;width:min(38vw,620px);height:min(78vh,820px);
-      opacity:0;transform:translate3d(-50%,0,0) scale(.86);transform-origin:center;
-      pointer-events:none;overflow:visible;will-change:opacity,transform;backface-visibility:hidden;
+    .clip03-woman.is-smoke-fading-out{
+      opacity:0;
+      transform:translate(-50%,0) scale(.985);
+      transition:opacity 1100ms cubic-bezier(.22,.61,.36,1),transform 1100ms cubic-bezier(.22,.61,.36,1);
     }
-    .clip03-dialog-side-puff--left{left:20%;}
-    .clip03-dialog-side-puff--right{left:80%;}
-    .clip03-dialog-side-puff.is-active{
-      opacity:1;transform:translate3d(-50%,0,0) scale(1);
-      transition:opacity 440ms cubic-bezier(.16,.72,.25,1),transform 800ms cubic-bezier(.16,.72,.25,1);
+
+    .clip03-large-smoke{
+      position:absolute;
+      z-index:31;
+      width:clamp(240px,28vw,560px);
+      height:clamp(360px,62vh,760px);
+      opacity:0;
+      pointer-events:none;
+      overflow:visible;
+      transform:translate(-50%,0) scale(.96);
+      transition:opacity 700ms ease-out,transform 900ms cubic-bezier(.2,.72,.25,1);
+      will-change:opacity,transform;
     }
-    .clip03-dialog-side-puff.is-ending{
-      opacity:0;transform:translate3d(-50%,-1.5%,0) scale(1.10);
-      transition:opacity 1000ms cubic-bezier(.22,.61,.36,1),transform 1000ms cubic-bezier(.22,.61,.36,1);
+
+    .clip03-large-smoke--woman{left:22%;bottom:4%;}
+    .clip03-large-smoke--dialog-left{left:20%;bottom:4%;}
+    .clip03-large-smoke--dialog-right{left:80%;bottom:4%;}
+
+    .clip03-large-smoke.is-active{
+      opacity:1;
+      transform:translate(-50%,0) scale(1);
     }
-    .clip03-dialog-side-puff__cloud{
-      position:absolute;left:var(--px);top:var(--py);width:clamp(90px,8.6vw,165px);aspect-ratio:1;
-      border-radius:50%;opacity:0;transform:translate3d(-50%,-50%,0) scale(calc(.56 * var(--ps)));
-      background:radial-gradient(circle at 42% 38%,rgba(var(--tone),.98) 0 24%,rgba(var(--tone),.90) 40%,rgba(var(--tone),.62) 56%,rgba(var(--tone),.25) 69%,transparent 82%);
-      animation:clip03DialogSidePuffCloud 1250ms cubic-bezier(.16,.72,.25,1) forwards;
-      animation-delay:var(--delay);will-change:opacity,transform;backface-visibility:hidden;
+
+    .clip03-large-smoke.is-ending{
+      opacity:0;
+      transform:translate(-50%,-5%) scale(1.14);
+      transition:opacity 2600ms cubic-bezier(.22,.61,.36,1),transform 2600ms cubic-bezier(.22,.61,.36,1);
     }
-    @keyframes clip03DialogSidePuffCloud{
-      0%{opacity:0;transform:translate3d(-50%,-50%,0) scale(calc(.50 * var(--ps)));}
-      30%{opacity:.98;transform:translate3d(calc(-50% + var(--dx)*.22),calc(-50% + var(--dy)*.22),0) scale(calc(.84 * var(--ps)));}
-      68%{opacity:.95;transform:translate3d(calc(-50% + var(--dx)*.64),calc(-50% + var(--dy)*.64),0) scale(calc(1.03 * var(--ps)));}
-      100%{opacity:.89;transform:translate3d(calc(-50% + var(--dx)),calc(-50% + var(--dy)),0) scale(calc(1.15 * var(--ps)));}
+
+    .clip03-large-smoke__wisp{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:44%;
+      height:52%;
+      border-radius:50%;
+      opacity:0;
+      transform:translateX(-50%) scale(.55);
+      background:
+        radial-gradient(ellipse at 50% 78%,
+          rgba(242,242,242,.72) 0 14%,
+          rgba(205,205,205,.54) 28%,
+          rgba(145,145,145,.31) 49%,
+          transparent 72%);
+      filter:blur(10px);
+      mix-blend-mode:screen;
+      animation:clip03LargeSmokeRise 5.6s ease-in-out infinite;
+      animation-delay:calc(var(--smoke-index) * -0.56s);
+      will-change:transform,opacity;
+    }
+
+    .clip03-large-smoke__wisp:nth-child(2n){
+      left:38%;
+      width:55%;
+      height:62%;
+      filter:blur(13px);
+    }
+    .clip03-large-smoke__wisp:nth-child(3n){
+      left:62%;
+      width:60%;
+      height:68%;
+      filter:blur(15px);
+    }
+    .clip03-large-smoke__wisp:nth-child(4n){
+      left:48%;
+      width:68%;
+      height:74%;
+      filter:blur(17px);
+    }
+
+    @keyframes clip03LargeSmokeRise{
+      0%{
+        opacity:0;
+        transform:translate(-50%,12%) scale(.52) rotate(-4deg);
+      }
+      15%{opacity:.78;}
+      40%{
+        opacity:.68;
+        transform:translate(-58%,-45%) scale(.92) rotate(5deg);
+      }
+      68%{
+        opacity:.46;
+        transform:translate(-40%,-108%) scale(1.32) rotate(-6deg);
+      }
+      100%{
+        opacity:0;
+        transform:translate(-62%,-178%) scale(1.76) rotate(8deg);
+      }
     }
 
     .clip03-dialog-goat{transition:none !important;}
@@ -1197,14 +1233,6 @@
     /* Singbildwechsel selbst: KEIN Crossfade. */
     .clip03-woman.is-visible {
       opacity: 1;
-    }
-
-    .clip03-woman.is-puffing-out {
-      opacity: 0;
-      transform: translate(-50%, 0) scale(.94);
-      transition:
-        opacity 260ms ease-out,
-        transform 420ms ease-out;
     }
 
     /* Nur die ausdrücklich gewünschten Ein-/Ausblendungen bei 12, 22 und 43 Sekunden. */
@@ -1268,6 +1296,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-johann-escalation-01"></script>
+  <script src="app.js?v=clip03-smoke-slowrise-02"></script>
 </body>
 </html>

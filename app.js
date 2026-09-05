@@ -805,42 +805,33 @@ function startClip03Singing(layer, token, isAllowed) {
 }
 
 
-function createClip03WomanWhitePuff(layer) {
-  const puff = document.createElement("div");
-  puff.className = "clip03-woman-white-puff";
-  const clouds = [
-    {x:14,y:20,s:1.02,t:"255,255,255",dx:-14,dy:-18,d:0},
-    {x:32,y:15,s:.90,t:"245,246,244",dx:-7,dy:-24,d:55},
-    {x:50,y:19,s:1.18,t:"255,253,247",dx:3,dy:-22,d:95},
-    {x:68,y:16,s:.96,t:"236,239,241",dx:10,dy:-20,d:35},
-    {x:84,y:24,s:1.06,t:"255,255,255",dx:16,dy:-14,d:120},
-    {x:11,y:43,s:1.14,t:"248,248,244",dx:-18,dy:-7,d:80},
-    {x:29,y:39,s:1.30,t:"255,255,255",dx:-9,dy:-10,d:20},
-    {x:49,y:40,s:1.44,t:"250,249,244",dx:0,dy:-10,d:110},
-    {x:69,y:40,s:1.28,t:"234,238,240",dx:10,dy:-7,d:45},
-    {x:88,y:45,s:1.08,t:"255,255,255",dx:19,dy:-3,d:135},
-    {x:18,y:65,s:1.08,t:"240,242,240",dx:-14,dy:7,d:105},
-    {x:38,y:61,s:1.28,t:"255,255,252",dx:-5,dy:4,d:35},
-    {x:59,y:62,s:1.36,t:"245,245,241",dx:6,dy:5,d:90},
-    {x:79,y:66,s:1.14,t:"255,255,255",dx:15,dy:10,d:60},
-    {x:31,y:83,s:.98,t:"252,252,250",dx:-7,dy:17,d:65},
-    {x:55,y:81,s:1.12,t:"238,241,242",dx:4,dy:18,d:125},
-    {x:77,y:84,s:.94,t:"255,253,248",dx:14,dy:20,d:85}
-  ];
-  clouds.forEach(c => {
-    const cloud = document.createElement("span");
-    cloud.className = "clip03-woman-white-puff__cloud";
-    cloud.style.setProperty("--px", `${c.x}%`);
-    cloud.style.setProperty("--py", `${c.y}%`);
-    cloud.style.setProperty("--ps", c.s);
-    cloud.style.setProperty("--tone", c.t);
-    cloud.style.setProperty("--dx", `${c.dx}px`);
-    cloud.style.setProperty("--dy", `${c.dy}px`);
-    cloud.style.setProperty("--delay", `${c.d}ms`);
-    puff.appendChild(cloud);
+function createClip03LargeSmoke(container, className) {
+  const smoke = document.createElement("div");
+  smoke.className = `clip03-large-smoke ${className}`;
+
+  for (let index = 0; index < 10; index += 1) {
+    const wisp = document.createElement("span");
+    wisp.className = "clip03-large-smoke__wisp";
+    wisp.style.setProperty("--smoke-index", String(index));
+    smoke.appendChild(wisp);
+  }
+
+  container.appendChild(smoke);
+
+  requestAnimationFrame(() => {
+    smoke.classList.add("is-active");
   });
-  layer.appendChild(puff);
-  return puff;
+
+  return smoke;
+}
+
+async function fadeClip03SmokeAway(smoke, token, holdMs = 1200, fadeMs = 2200) {
+  if (!smoke) return true;
+  if (!(await waitClip03(holdMs, token))) return false;
+  smoke.classList.add("is-ending");
+  if (!(await waitClip03(fadeMs, token))) return false;
+  smoke.remove();
+  return true;
 }
 
 function createClip03QuestionMark(layer) {
@@ -931,68 +922,43 @@ async function playClip03GoatReaction(layer, token) {
   goat.src = clip03DialogGoatImage03;
 }
 
-function createClip03SidePuff(scene, side) {
-  const puff = document.createElement("div");
-  puff.className = `clip03-dialog-side-puff clip03-dialog-side-puff--${side}`;
-  const data = [
-    [13,22,1.02,"255,255,255",-14,-16,0],[34,16,.88,"246,247,245",-7,-20,55],
-    [55,19,1.16,"255,253,247",3,-19,90],[76,23,1.02,"238,241,242",12,-13,35],
-    [18,44,1.18,"250,250,247",-12,-7,75],[43,40,1.34,"255,255,255",-3,-8,20],
-    [67,42,1.26,"241,243,243",9,-5,105],[87,47,1.04,"255,255,252",16,-2,45],
-    [25,66,1.12,"242,244,243",-8,7,110],[51,63,1.32,"255,255,255",2,5,50],
-    [76,67,1.14,"238,241,243",11,9,85],[38,84,1.02,"255,253,248",-3,15,65],
-    [65,83,.98,"245,246,244",7,17,120]
-  ];
-
-  data.forEach(([x,y,s,t,dx,dy,d]) => {
-    const c = document.createElement("span");
-    c.className = "clip03-dialog-side-puff__cloud";
-    c.style.setProperty("--px", `${x}%`);
-    c.style.setProperty("--py", `${y}%`);
-    c.style.setProperty("--ps", String(s));
-    c.style.setProperty("--tone", t);
-    c.style.setProperty("--dx", `${dx}px`);
-    c.style.setProperty("--dy", `${dy}px`);
-    c.style.setProperty("--delay", `${d}ms`);
-    puff.appendChild(c);
-  });
-
-  scene.appendChild(puff);
-  return puff;
-}
-
-async function puffOutClip03DialogSides(d, token) {
-  const leftPuff = createClip03SidePuff(d.scene, "left");
-  const rightPuff = createClip03SidePuff(d.scene, "right");
-
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+async function fadeOutClip03DialogSidesWithSmoke(d, token) {
   if (token !== clip03RunToken) return false;
 
-  leftPuff.classList.add("is-active");
-  rightPuff.classList.add("is-active");
-  d.left.classList.add("is-puffing-out");
-  d.right.classList.add("is-puffing-out");
+  const leftSmoke = createClip03LargeSmoke(d.scene, "clip03-large-smoke--dialog-left");
+  const rightSmoke = createClip03LargeSmoke(d.scene, "clip03-large-smoke--dialog-right");
+
+  d.left.classList.add("is-smoke-fading-out");
+  d.right.classList.add("is-smoke-fading-out");
   d.left.classList.remove("is-visible");
   d.right.classList.remove("is-visible");
 
-  if (!(await waitClip03(1200, token))) return false;
-  leftPuff.classList.add("is-ending");
-  rightPuff.classList.add("is-ending");
-
-  if (!(await waitClip03(1000, token))) return false;
-  leftPuff.remove();
-  rightPuff.remove();
+  // Figuren selbst verschwinden weich; der Rauch bleibt sichtbar und zieht danach langsam ab.
+  if (!(await waitClip03(1100, token))) return false;
   d.left.remove();
   d.right.remove();
+
+  leftSmoke.classList.add("is-ending");
+  rightSmoke.classList.add("is-ending");
+
+  if (!(await waitClip03(2600, token))) return false;
+  leftSmoke.remove();
+  rightSmoke.remove();
   return true;
 }
 
-async function flickerClip03CenterWhileSidesDisappear(d, token) {
-  let running = true;
+async function flickerClip03Center(d, layer, token) {
+  if (token !== clip03RunToken) return;
+
   let showKnightNext = false;
+  let running = true;
+
+  // Ziegenfolge startet ERST jetzt – also exakt beim Beginn des Flackerns.
+  playClip03GoatReaction(layer, token);
 
   const flicker = () => {
     if (!running || token !== clip03RunToken) return;
+
     setClip03DialogImage(
       d.center,
       showKnightNext ? clip03DialogCenterImage04 : clip03DialogCenterImage03
@@ -1006,21 +972,26 @@ async function flickerClip03CenterWhileSidesDisappear(d, token) {
     clip03Timers.add(timer);
   };
 
-  // Flackern startet direkt mit Anhang 6.
+  // Start direkt mit Anhang 6.
   setClip03DialogImage(d.center, clip03DialogCenterImage04);
   showKnightNext = false;
+
   const first = setTimeout(() => {
     clip03Timers.delete(first);
     flicker();
   }, 400);
   clip03Timers.add(first);
 
-  const done = await puffOutClip03DialogSides(d, token);
-  running = false;
-  if (!done || token !== clip03RunToken) return;
+  // Flackern ist jetzt vollständig unabhängig vom Verschwinden der Außenfiguren
+  // und läuft bewusst deutlich länger: 7,2 Sekunden.
+  if (!(await waitClip03(7200, token))) {
+    running = false;
+    return;
+  }
 
-  // Sobald beide Außenfiguren und beide Puffs komplett verschwunden sind:
-  // Mittelcharakter zurück auf Anhang 1 und stehen lassen.
+  running = false;
+
+  // Danach wie bisher: Mittelcharakter zurück auf Anhang 1 und stehen lassen.
   setClip03DialogImage(d.center, clip03DialogCenterImage01);
 }
 
@@ -1056,23 +1027,30 @@ async function playClip03PostPuffDialogue(layer, token) {
   if (!(await waitClip03(3000, token))) return;
   hideClip03DialogElement(d.centerBubble);
 
-  // Mitte fährt langsam hoch; gleichzeitig Außenfiguren reagieren und Ziege wechselt.
+  // Mitte fährt jetzt DEUTLICH langsamer hoch.
+  // Außenfiguren wechseln sofort auf ihre Reaktionsbilder.
   setClip03DialogImage(d.left, clip03DialogLeftImage03);
   setClip03DialogImage(d.right, clip03DialogRightImage03);
   showClip03DialogElement(d.centerReveal);
-  playClip03GoatReaction(layer, token);
 
-  if (!(await waitClip03(3600, token))) return;
+  // Schon kurz nachdem der Mittelcharakter sichtbar hochgefahren ist,
+  // verschwinden links/rechts weich und werden von großem Rauch ersetzt.
+  if (!(await waitClip03(1700, token))) return;
+  fadeOutClip03DialogSidesWithSmoke(d, token);
 
-  // Mitte: 4 für 0,8 s, dann 5 für 0,8 s.
+  // Gesamte Hochfahrt jetzt 7 Sekunden.
+  if (!(await waitClip03(5300, token))) return;
+
+  // Erst NACH vollständig abgeschlossener Hochfahrt:
+  // Mitte Anhang 4 -> 0,8 s -> Anhang 5 -> 0,8 s.
   setClip03DialogImage(d.center, clip03DialogCenterImage02);
   if (!(await waitClip03(800, token))) return;
 
   setClip03DialogImage(d.center, clip03DialogCenterImage03);
   if (!(await waitClip03(800, token))) return;
 
-  // Danach 5/6 im 0,4-s-Flackern; zeitgleich verschwinden links/rechts im weißen Puff.
-  await flickerClip03CenterWhileSidesDisappear(d, token);
+  // Erst JETZT beginnt das 5/6-Flackern UND gleichzeitig die Ziegenfolge.
+  await flickerClip03Center(d, layer, token);
 }
 
 function playClip03WomanEndSequence(layer, token) {
@@ -1110,29 +1088,30 @@ function playClip03WomanEndSequence(layer, token) {
 
 async function finishClip03WomanWithPuff(layer, token, questionMark = null) {
   if (token !== clip03RunToken) return;
+
   const woman = layer?.querySelector(".clip03-woman");
-  const puff = createClip03WomanWhitePuff(layer);
+  const smoke = createClip03LargeSmoke(layer, "clip03-large-smoke--woman");
 
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  if (token !== clip03RunToken) return;
-
-  puff.classList.add("is-active");
+  // Frau verschwindet selbst nur noch smooth – KEIN weißer Puff mehr.
   if (woman) {
     woman.classList.remove("is-visible");
-    woman.classList.add("is-puffing-out");
+    woman.classList.remove("is-puffing-out");
+    woman.classList.add("is-smoke-fading-out");
   }
 
-  if (!(await waitClip03(1600, token))) return;
-  puff.classList.add("is-ending");
+  if (!(await waitClip03(1100, token))) return;
+  if (woman) woman.remove();
+
+  // Fragezeichen bleibt bis zum langsamen Rauch-Ausgang gekoppelt.
+  smoke.classList.add("is-ending");
   if (questionMark) {
     questionMark.classList.remove("is-visible");
     questionMark.classList.add("is-fading-out");
   }
 
-  if (!(await waitClip03(1250, token))) return;
+  if (!(await waitClip03(2600, token))) return;
 
-  puff.remove();
-  if (woman) woman.remove();
+  smoke.remove();
   if (questionMark) questionMark.remove();
 
   playClip03PostPuffDialogue(layer, token);
