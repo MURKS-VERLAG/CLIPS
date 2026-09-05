@@ -19,6 +19,8 @@ clip03Soundtrack.volume = 1;
 const clip03GedoresImage = "assets/clip03/gedoes-hubacker.webp";
 const clip03NuwensteinImage = "assets/clip03/nuwenstein.webp";
 const clip03BerenbachImage = "assets/clip03/berenbach.webp";
+const clip03HansNuwensteinImage = "assets/clip03/johann-hans-nuwenstein.webp";
+const clip03AnnaNuwensteinImage = "assets/clip03/anna-nuwenstein.webp";
 const clip03WomanRest = "assets/clip03/woman-rest.webp";
 const clip03WomanSingImages = [
   "assets/clip03/woman-sing-01.webp",
@@ -513,6 +515,62 @@ function hideClip03CastleTitle(entry) {
   entry.title.classList.remove("is-visible");
 }
 
+
+function createClip03NuwensteinFamilySequence(layer) {
+  const sequence = document.createElement("div");
+  sequence.className = "clip03-family-sequence";
+
+  const houseTitle = document.createElement("div");
+  houseTitle.className = "clip03-house-title";
+  houseTitle.textContent = "HAUS NUWENSTEIN";
+
+  const hans = document.createElement("div");
+  hans.className = "clip03-family-person clip03-family-person--hans";
+  hans.innerHTML = `
+    <div class="clip03-family-name">JOHANN "HANS" NUWENSTEIN</div>
+    <img class="clip03-family-image" src="${clip03HansNuwensteinImage}" alt="" draggable="false">
+  `;
+
+  const anna = document.createElement("div");
+  anna.className = "clip03-family-person clip03-family-person--anna";
+  anna.innerHTML = `
+    <div class="clip03-family-name">ANNA NUWENSTEIN</div>
+    <img class="clip03-family-image" src="${clip03AnnaNuwensteinImage}" alt="" draggable="false">
+  `;
+
+  const rings = document.createElement("div");
+  rings.className = "clip03-marriage-rings";
+  rings.innerHTML = `
+    <span class="clip03-marriage-ring clip03-marriage-ring--left"></span>
+    <span class="clip03-marriage-ring clip03-marriage-ring--right"></span>
+  `;
+
+  sequence.appendChild(houseTitle);
+  sequence.appendChild(hans);
+  sequence.appendChild(anna);
+  sequence.appendChild(rings);
+  layer.appendChild(sequence);
+
+  return { sequence, houseTitle, hans, anna, rings };
+}
+
+function showClip03FamilyElement(el) {
+  if (!el) return;
+  el.classList.remove("is-fading-out");
+  requestAnimationFrame(() => el.classList.add("is-visible"));
+}
+
+function hideClip03FamilyElement(el) {
+  if (!el) return;
+  el.classList.remove("is-visible");
+  el.classList.add("is-fading-out");
+}
+
+function hideClip03NuwensteinFamily(sequence) {
+  if (!sequence) return;
+  [sequence.houseTitle, sequence.hans, sequence.anna, sequence.rings].forEach(hideClip03FamilyElement);
+}
+
 function getClip03Woman(layer) {
   if (!layer) return null;
 
@@ -628,9 +686,18 @@ async function playClip03() {
 
   const gedoesCard = createClip03GedoresCard(layer);
   const castleSequence = createClip03CastleSequence(layer);
+  const familySequence = createClip03NuwensteinFamilySequence(layer);
 
-  // Gedösbild + Burgenbilder + alle Frauenbilder vorladen, damit die 0,3-s-Wechsel sauber bleiben.
-  [clip03GedoresImage, clip03NuwensteinImage, clip03BerenbachImage, clip03WomanRest, ...clip03WomanSingImages].forEach((src) => {
+  // Clip-03-Bilder vorladen, damit alle Einblendungen sauber bleiben.
+  [
+    clip03GedoresImage,
+    clip03NuwensteinImage,
+    clip03BerenbachImage,
+    clip03HansNuwensteinImage,
+    clip03AnnaNuwensteinImage,
+    clip03WomanRest,
+    ...clip03WomanSingImages
+  ].forEach((src) => {
     const preload = new Image();
     preload.src = src;
   });
@@ -650,6 +717,7 @@ async function playClip03() {
   let singingRun = 0;
   let castlePhase = "before12";
   let castleTitlePhase = "before12";
+  let familyPhase = "before24";
 
   const tick = () => {
     if (token !== clip03RunToken) return;
@@ -672,30 +740,21 @@ async function playClip03() {
       hideClip03CastleCard(castleSequence.berenbach);
     }
 
-    if (t >= 12 && t < 15 && castleTitlePhase !== "nuwenstein-title") {
+    if (t >= 12 && t < 17 && castleTitlePhase !== "nuwenstein-title") {
       castleTitlePhase = "nuwenstein-title";
       showClip03CastleTitle(castleSequence.nuwenstein);
     }
 
-    if (t >= 15 && t < 17 && castleTitlePhase !== "nuwenstein-off") {
-      castleTitlePhase = "nuwenstein-off";
-      hideClip03CastleTitle(castleSequence.nuwenstein);
-    }
-
     if (t >= 17 && t < 22 && castlePhase !== "berenbach") {
       castlePhase = "berenbach";
+      hideClip03CastleTitle(castleSequence.nuwenstein);
       hideClip03CastleCard(castleSequence.nuwenstein);
       showClip03CastleCard(castleSequence.berenbach);
     }
 
-    if (t >= 17 && t < 20 && castleTitlePhase !== "berenbach-title") {
+    if (t >= 17 && t < 22 && castleTitlePhase !== "berenbach-title") {
       castleTitlePhase = "berenbach-title";
       showClip03CastleTitle(castleSequence.berenbach);
-    }
-
-    if (t >= 20 && t < 22 && castleTitlePhase !== "berenbach-off") {
-      castleTitlePhase = "berenbach-off";
-      hideClip03CastleTitle(castleSequence.berenbach);
     }
 
     if (t >= 22 && castlePhase !== "done") {
@@ -704,6 +763,48 @@ async function playClip03() {
       hideClip03CastleCard(castleSequence.berenbach);
       hideClip03CastleTitle(castleSequence.nuwenstein);
       hideClip03CastleTitle(castleSequence.berenbach);
+    }
+
+
+    /*
+      HAUS NUWENSTEIN:
+      22–24 s Pause
+      24–26 s Haus-Titel
+      27 s Hans
+      28 s Anna
+      29 s Eheringe
+      32 s alles gemeinsam smooth raus
+    */
+    if (t >= 24 && t < 26 && familyPhase === "before24") {
+      familyPhase = "house-title";
+      showClip03FamilyElement(familySequence.houseTitle);
+    }
+
+    if (t >= 26 && t < 27 && familyPhase === "house-title") {
+      familyPhase = "house-title-out";
+      hideClip03FamilyElement(familySequence.houseTitle);
+    }
+
+    if (t >= 27 && t < 28 && familyPhase === "house-title-out") {
+      familyPhase = "hans";
+      showClip03FamilyElement(familySequence.hans);
+    }
+
+    if (t >= 28 && t < 29 && familyPhase === "hans") {
+      familyPhase = "anna";
+      showClip03FamilyElement(familySequence.anna);
+    }
+
+    if (t >= 29 && t < 32 && familyPhase === "anna") {
+      familyPhase = "rings";
+      showClip03FamilyElement(familySequence.rings);
+    }
+
+    if (t >= 32 && familyPhase === "rings") {
+      familyPhase = "done";
+      hideClip03FamilyElement(familySequence.hans);
+      hideClip03FamilyElement(familySequence.anna);
+      hideClip03FamilyElement(familySequence.rings);
     }
 
     if (t >= 12 && t < 20 && phase !== "sing12") {
