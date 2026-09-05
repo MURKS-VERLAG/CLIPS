@@ -606,7 +606,7 @@
 
     .clip03-family-person {
       position: absolute;
-      bottom: 7%;
+      bottom: 10%;
       width: min(25vw, 390px);
       height: min(59vh, 660px);
       opacity: 0;
@@ -648,11 +648,10 @@
 
     .clip03-family-name {
       position: absolute;
-      left: 50%;
-      top: 0;
+      top: 12%;
       z-index: 2;
-      width: 140%;
-      transform: translateX(-50%);
+      width: min(18vw, 300px);
+      transform: none;
       text-align: center;
       color: #fff;
       font-family: Georgia, "Times New Roman", serif;
@@ -666,7 +665,17 @@
         -2px  2px 0 #a47a24,
          2px  2px 0 #a47a24,
          0 3px 7px rgba(0,0,0,.92);
-      white-space: nowrap;
+      white-space: normal;
+    }
+
+    .clip03-family-person--hans .clip03-family-name {
+      right: calc(100% + 1.2vw);
+      left: auto;
+    }
+
+    .clip03-family-person--anna .clip03-family-name {
+      left: calc(100% + 1.2vw);
+      right: auto;
     }
 
     /* Zwei überlappende goldene Eheringe zwischen Hans und Anna. */
@@ -675,8 +684,8 @@
       left: 50%;
       top: 55%;
       z-index: 12;
-      width: clamp(90px, 9vw, 170px);
-      height: clamp(70px, 7vw, 135px);
+      width: clamp(120px, 12vw, 220px);
+      height: clamp(78px, 8vw, 150px);
       transform: translate(-50%, -50%) scale(.86);
       opacity: 0;
       transition:
@@ -698,7 +707,7 @@
     .clip03-marriage-ring {
       position: absolute;
       top: 50%;
-      width: 58%;
+      width: 50%;
       aspect-ratio: 1;
       border: clamp(7px, .72vw, 13px) solid #d6a83b;
       border-radius: 50%;
@@ -710,12 +719,12 @@
     }
 
     .clip03-marriage-ring--left {
-      left: 17%;
+      left: 12%;
       transform: translateY(-50%) rotate(-16deg);
     }
 
     .clip03-marriage-ring--right {
-      right: 17%;
+      right: 12%;
       transform: translateY(-50%) rotate(16deg);
     }
 
@@ -805,6 +814,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-haus-nuwenstein-01"></script>
+  <script src="app.js?v=clip03-family-layout-minifix-01"></script>
 </body>
 </html>
