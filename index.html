@@ -1562,6 +1562,66 @@
       transform:translateX(0) scale(1);
     }
 
+
+    /* Clip 03: Vision direkt über der Hand des Mittelcharakters.
+       Position basiert auf der vom Nutzer markierten grünen Referenzstelle. */
+    .clip03-hand-vision{
+      position:absolute;
+      left:45.2%;
+      top:44.2%;
+      z-index:37;
+      width:min(10.5vw,165px);
+      height:min(25vh,260px);
+      transform:translate(-50%,-50%);
+      pointer-events:none;
+      overflow:visible;
+      filter:drop-shadow(0 7px 14px rgba(0,0,0,.48));
+    }
+
+    .clip03-hand-vision__image{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      display:block;
+      max-width:100%;
+      max-height:100%;
+      width:auto;
+      height:auto;
+      opacity:0;
+      transform:translateX(-50%) scale(.94);
+      transform-origin:center bottom;
+      object-fit:contain;
+      user-select:none;
+      pointer-events:none;
+      will-change:opacity,transform;
+      transition:
+        opacity 520ms cubic-bezier(.2,.72,.25,1),
+        transform 520ms cubic-bezier(.2,.72,.25,1);
+    }
+
+    .clip03-hand-vision__image.is-visible{
+      opacity:1;
+      transform:translateX(-50%) scale(1);
+    }
+
+    .clip03-hand-vision__image.is-fading-out{
+      opacity:0;
+      transform:translateX(-50%) scale(1.035);
+    }
+
+    .clip03-hand-vision__stone.is-hovering{
+      animation:clip03HandStoneHover 2.8s ease-in-out infinite;
+    }
+
+    @keyframes clip03HandStoneHover{
+      0%,100%{
+        transform:translateX(-50%) translateY(0) scale(1);
+      }
+      50%{
+        transform:translateX(-50%) translateY(-10px) scale(1.01);
+      }
+    }
+
 </style>
 </head>
 
@@ -1613,6 +1673,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-border-knights-02"></script>
+  <script src="app.js?v=clip03-knight-reaction-01"></script>
 </body>
 </html>

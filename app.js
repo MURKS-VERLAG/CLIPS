@@ -71,6 +71,11 @@ const clip03FamilyBurkhartBerenbachImage = "assets/clip03/dialog-family-burkhart
 const clip03FamilyNothburgaNuwensteinImage = "assets/clip03/dialog-family-nothburga-nuwenstein.webp";
 const clip03BorderKnightLeftImage = "assets/clip03/border-knight-left-red.webp";
 const clip03BorderKnightRightImage = "assets/clip03/border-knight-right-blue.webp";
+const clip03BorderCenterSurprisedImage = "assets/clip03/border-center-surprised.webp";
+const clip03BorderHandFireImage = "assets/clip03/border-hand-fire.webp";
+const clip03BorderHandStoneImage = "assets/clip03/border-hand-stone.webp";
+const clip03BorderKnightLeftKneelImage = "assets/clip03/border-knight-left-kneel.webp";
+const clip03BorderKnightRightPointImage = "assets/clip03/border-knight-right-point.webp";
 
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
@@ -1043,6 +1048,68 @@ function createClip03BorderKnights(layer) {
   return { left, right };
 }
 
+function setClip03BorderKnightImage(knight, src) {
+  const img = knight?.querySelector("img");
+  if (img) img.src = src;
+}
+
+function createClip03HandVision(layer) {
+  const vision = document.createElement("div");
+  vision.className = "clip03-hand-vision";
+
+  const fire = document.createElement("img");
+  fire.className = "clip03-hand-vision__image clip03-hand-vision__fire";
+  fire.src = clip03BorderHandFireImage;
+  fire.alt = "";
+  fire.draggable = false;
+
+  const stone = document.createElement("img");
+  stone.className = "clip03-hand-vision__image clip03-hand-vision__stone";
+  stone.src = clip03BorderHandStoneImage;
+  stone.alt = "";
+  stone.draggable = false;
+
+  vision.append(fire, stone);
+  layer.appendChild(vision);
+
+  return { vision, fire, stone };
+}
+
+async function playClip03BorderKnightReaction(layer, knights, token) {
+  if (token !== clip03RunToken || !layer || !knights) return;
+
+  const center = layer.querySelector(".clip03-dialog-center-character");
+  if (!center) return;
+
+  // Exakt sobald die beiden Ritter erscheinen:
+  // Mittelcharakter 2 Sekunden auf den neuen überraschten Anhang.
+  setClip03DialogImage(center, clip03BorderCenterSurprisedImage);
+
+  if (!(await waitClip03(2000, token))) return;
+
+  // Danach exakt zurück auf das bisherige stehende Endbild.
+  setClip03DialogImage(center, clip03DialogCenterImage01);
+
+  // Feuer direkt über seiner Hand – Position nach der grünen Referenzmarkierung.
+  const vision = createClip03HandVision(layer);
+  requestAnimationFrame(() => vision.fire.classList.add("is-visible"));
+
+  // Feuer insgesamt eine Sekunde sichtbar; Ein-/Ausblendung bleibt weich.
+  if (!(await waitClip03(1000, token))) return;
+
+  // Smooth vom Feuer zum brennenden Stein wechseln.
+  vision.fire.classList.remove("is-visible");
+  vision.fire.classList.add("is-fading-out");
+  vision.stone.classList.add("is-visible", "is-hovering");
+
+  // Genau beim Erscheinen des hovernden Steins wechseln auch die beiden Ritter.
+  setClip03BorderKnightImage(knights.left, clip03BorderKnightLeftKneelImage);
+  setClip03BorderKnightImage(knights.right, clip03BorderKnightRightPointImage);
+
+  // Szene bleibt ab hier dauerhaft so stehen.
+}
+
+
 async function playClip03BorderCollapse(layer, token) {
   if (token !== clip03RunToken) return;
 
@@ -1088,6 +1155,9 @@ async function playClip03BorderCollapse(layer, token) {
   // Während alle sechs Symbole weich verschwinden, kommen hinter dem Rauch
   // die beiden neuen Ritter herein.
   const knights = createClip03BorderKnights(layer);
+
+  // Neue Folge startet SOFORT beim Erscheinen der Ritter – parallel zum ausziehenden Rauch.
+  playClip03BorderKnightReaction(layer, knights, token);
 
   const smokes = [
     createClip03BorderSmoke(layer, "clip03-border-smoke--helmet-left"),
@@ -1393,7 +1463,12 @@ async function playClip03() {
     clip03FamilyBurkhartBerenbachImage,
     clip03FamilyNothburgaNuwensteinImage,
     clip03BorderKnightLeftImage,
-    clip03BorderKnightRightImage
+    clip03BorderKnightRightImage,
+    clip03BorderCenterSurprisedImage,
+    clip03BorderHandFireImage,
+    clip03BorderHandStoneImage,
+    clip03BorderKnightLeftKneelImage,
+    clip03BorderKnightRightPointImage
   ].forEach((src) => {
     const preload = new Image();
     preload.src = src;
