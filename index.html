@@ -1454,20 +1454,20 @@
       will-change:left,transform,opacity;
     }
 
-    .clip03-border-sword--left.is-inset{left:6.3% !important;}
-    .clip03-border-sword--right.is-inset{left:93.3% !important;}
+    .clip03-border-sword--left.is-inset{left:8.3% !important;}
+    .clip03-border-sword--right.is-inset{left:91.3% !important;}
 
     .clip03-border-sword--left.is-horizontal{
-      transform:translate(-50%,-50%) rotate(90deg) scale(var(--clip03-symbol-scale,1)) !important;
+      transform:translate(-50%,-50%) rotate(-90deg) scale(var(--clip03-symbol-scale,1)) !important;
     }
 
     .clip03-border-sword--right.is-horizontal{
-      transform:translate(-50%,-50%) scaleX(-1) rotate(90deg) scale(var(--clip03-symbol-scale,1)) !important;
+      transform:translate(-50%,-50%) scaleX(-1) rotate(-90deg) scale(var(--clip03-symbol-scale,1)) !important;
     }
 
     .clip03-border-converge{
       transition:
-        top 2600ms cubic-bezier(.18,.72,.22,1),
+        top 2600ms linear,
         opacity 1100ms cubic-bezier(.22,.61,.36,1) !important;
       will-change:top,opacity;
     }
@@ -1490,16 +1490,16 @@
     /* Sechs große Rauchfelder liegen jeweils genau über den aufgelösten Randobjekten. */
     .clip03-large-smoke--border{
       z-index:34;
-      width:clamp(220px,24vw,480px);
-      height:clamp(300px,50vh,650px);
+      width:clamp(280px,31vw,620px);
+      height:clamp(380px,62vh,790px);
       bottom:auto;
     }
 
     .clip03-border-smoke--helmet-left{left:6.3%;top:42%;}
-    .clip03-border-smoke--sword-left{left:6.3%;top:51%;}
+    .clip03-border-smoke--sword-left{left:8.3%;top:51%;}
     .clip03-border-smoke--crest-left{left:6.3%;top:58%;}
     .clip03-border-smoke--helmet-right{left:93.3%;top:42%;}
-    .clip03-border-smoke--sword-right{left:93.3%;top:51%;}
+    .clip03-border-smoke--sword-right{left:91.3%;top:51%;}
     .clip03-border-smoke--crest-right{left:93.3%;top:58%;}
 
     .clip03-large-smoke--border.is-ending{
@@ -1515,8 +1515,8 @@
       position:absolute;
       z-index:32;
       bottom:8.5%;
-      width:min(36vw,620px);
-      height:min(68vh,760px);
+      width:min(32vw,550px);
+      height:min(61vh,690px);
       opacity:0;
       pointer-events:none;
       transition:
@@ -1613,6 +1613,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-border-knights-01"></script>
+  <script src="app.js?v=clip03-border-knights-02"></script>
 </body>
 </html>

@@ -1070,7 +1070,7 @@ async function playClip03BorderCollapse(layer, token) {
   if (!(await waitClip03(1700, token))) return;
 
   // Nun obere Helme nach unten und untere Seitenwappen nach oben.
-  // Zielpositionen lassen bewusst ungefähr 1 cm Luft zwischen Helm und Wappen.
+  // Bewegung läuft konstant ohne Abbremsen; am Ziel startet sofort die Auflösung.
   helmetLeft.classList.add("clip03-border-converge", "clip03-border-converge--helmet-left");
   helmetRight.classList.add("clip03-border-converge", "clip03-border-converge--helmet-right");
   crestLeft.classList.add("clip03-border-converge", "clip03-border-converge--crest-left");
