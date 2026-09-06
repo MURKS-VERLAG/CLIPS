@@ -76,6 +76,8 @@ const clip03BorderHandFireImage = "assets/clip03/border-hand-fire.webp";
 const clip03BorderHandStoneImage = "assets/clip03/border-hand-stone.webp";
 const clip03BorderKnightLeftKneelImage = "assets/clip03/border-knight-left-kneel.webp";
 const clip03BorderKnightRightPointImage = "assets/clip03/border-knight-right-point.webp";
+const clip03CenterBubbleLeftImage = "assets/clip03/center-bubble-left-red.webp";
+const clip03CenterBubbleRightImage = "assets/clip03/center-bubble-right-blue.webp";
 
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
@@ -1264,8 +1266,8 @@ async function flickerClip03Center(d, layer, token) {
   }, 400);
   clip03Timers.add(first);
 
-  // Flackern endet nochmals 1,6 Sekunden früher: jetzt 3,6 Sekunden.
-  if (!(await waitClip03(3600, token))) {
+  // Nochmals um exakt zwei 0,4-s-Bildwechsel gekürzt: jetzt 2,8 Sekunden.
+  if (!(await waitClip03(2800, token))) {
     running = false;
     return;
   }
@@ -1307,12 +1309,16 @@ async function playClip03PostPuffDialogue(layer, token) {
   hideClip03DialogElement(d.leftBubble);
 
   // Danach: "ICH BIN AUCH JOHANN!!!" für 3 Sekunden.
+  // Exakt beim Erscheinen der Sprechblase wechseln links/rechts temporär
+  // auf die neuen Anhänge; Position/Größe bleiben durch dieselben Wrapper identisch.
+  setClip03DialogImage(d.left, clip03CenterBubbleLeftImage);
+  setClip03DialogImage(d.right, clip03CenterBubbleRightImage);
   showClip03DialogElement(d.centerBubble);
   if (!(await waitClip03(3000, token))) return;
   hideClip03DialogElement(d.centerBubble);
 
   // Mitte fährt jetzt DEUTLICH langsamer hoch.
-  // Außenfiguren wechseln sofort auf ihre Reaktionsbilder.
+  // Hier bleibt der bereits vorhandene normale Wechsel bestehen.
   setClip03DialogImage(d.left, clip03DialogLeftImage03);
   setClip03DialogImage(d.right, clip03DialogRightImage03);
   showClip03DialogElement(d.centerReveal);
@@ -1468,7 +1474,9 @@ async function playClip03() {
     clip03BorderHandFireImage,
     clip03BorderHandStoneImage,
     clip03BorderKnightLeftKneelImage,
-    clip03BorderKnightRightPointImage
+    clip03BorderKnightRightPointImage,
+    clip03CenterBubbleLeftImage,
+    clip03CenterBubbleRightImage
   ].forEach((src) => {
     const preload = new Image();
     preload.src = src;
