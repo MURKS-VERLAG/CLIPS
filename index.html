@@ -1443,7 +1443,126 @@
       opacity: 0;
     }
 
-  </style>
+  
+    /* Clip 03: Rand-Symbole schließen sich nach der Waldstraße-Familie. */
+    .clip03-border-sword{
+      transition:
+        left 1050ms cubic-bezier(.2,.72,.25,1),
+        transform 1700ms cubic-bezier(.16,.74,.22,1),
+        opacity 1100ms cubic-bezier(.22,.61,.36,1) !important;
+      transform-origin:center center;
+      will-change:left,transform,opacity;
+    }
+
+    .clip03-border-sword--left.is-inset{left:6.3% !important;}
+    .clip03-border-sword--right.is-inset{left:93.3% !important;}
+
+    .clip03-border-sword--left.is-horizontal{
+      transform:translate(-50%,-50%) rotate(90deg) scale(var(--clip03-symbol-scale,1)) !important;
+    }
+
+    .clip03-border-sword--right.is-horizontal{
+      transform:translate(-50%,-50%) scaleX(-1) rotate(90deg) scale(var(--clip03-symbol-scale,1)) !important;
+    }
+
+    .clip03-border-converge{
+      transition:
+        top 2600ms cubic-bezier(.18,.72,.22,1),
+        opacity 1100ms cubic-bezier(.22,.61,.36,1) !important;
+      will-change:top,opacity;
+    }
+
+    .clip03-border-converge--helmet-left.is-converged,
+    .clip03-border-converge--helmet-right.is-converged{
+      top:42.4% !important;
+    }
+
+    .clip03-border-converge--crest-left.is-converged,
+    .clip03-border-converge--crest-right.is-converged{
+      top:57.6% !important;
+    }
+
+    .clip03-symbol.is-border-dissolving{
+      opacity:0 !important;
+      transition:opacity 1100ms cubic-bezier(.22,.61,.36,1) !important;
+    }
+
+    /* Sechs große Rauchfelder liegen jeweils genau über den aufgelösten Randobjekten. */
+    .clip03-large-smoke--border{
+      z-index:34;
+      width:clamp(220px,24vw,480px);
+      height:clamp(300px,50vh,650px);
+      bottom:auto;
+    }
+
+    .clip03-border-smoke--helmet-left{left:6.3%;top:42%;}
+    .clip03-border-smoke--sword-left{left:6.3%;top:51%;}
+    .clip03-border-smoke--crest-left{left:6.3%;top:58%;}
+    .clip03-border-smoke--helmet-right{left:93.3%;top:42%;}
+    .clip03-border-smoke--sword-right{left:93.3%;top:51%;}
+    .clip03-border-smoke--crest-right{left:93.3%;top:58%;}
+
+    .clip03-large-smoke--border.is-ending{
+      opacity:0;
+      transform:translate(-50%,-12%) scale(1.18);
+      transition:
+        opacity 3000ms cubic-bezier(.22,.61,.36,1),
+        transform 3000ms cubic-bezier(.22,.61,.36,1);
+    }
+
+    /* Neue Ritter erscheinen gleichzeitig hinter dem Rauch und bleiben stehen. */
+    .clip03-border-knight{
+      position:absolute;
+      z-index:32;
+      bottom:8.5%;
+      width:min(36vw,620px);
+      height:min(68vh,760px);
+      opacity:0;
+      pointer-events:none;
+      transition:
+        opacity 1200ms cubic-bezier(.2,.72,.25,1),
+        transform 1200ms cubic-bezier(.2,.72,.25,1);
+      filter:drop-shadow(0 9px 16px rgba(0,0,0,.52));
+    }
+
+    .clip03-border-knight img{
+      display:block;
+      max-width:100%;
+      max-height:100%;
+      width:auto;
+      height:auto;
+      object-fit:contain;
+      user-select:none;
+      pointer-events:none;
+    }
+
+    .clip03-border-knight--left{
+      left:6.5%;
+      transform:translateX(-4%) scale(.97);
+      transform-origin:left bottom;
+    }
+
+    .clip03-border-knight--right{
+      right:6.5%;
+      transform:translateX(4%) scale(.97);
+      transform-origin:right bottom;
+    }
+
+    .clip03-border-knight--right img{
+      transform:scaleX(-1);
+    }
+
+    .clip03-border-knight--left.is-visible{
+      opacity:1;
+      transform:translateX(0) scale(1);
+    }
+
+    .clip03-border-knight--right.is-visible{
+      opacity:1;
+      transform:translateX(0) scale(1);
+    }
+
+</style>
 </head>
 
 <body>
@@ -1494,6 +1613,6 @@
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-waldstrasse-family-04"></script>
+  <script src="app.js?v=clip03-border-knights-01"></script>
 </body>
 </html>

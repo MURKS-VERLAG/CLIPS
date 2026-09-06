@@ -69,6 +69,8 @@ const clip03DialogGoatImage03 = "assets/clip03/dialog-goat-03-blank.png";
 const clip03FamilyJohannesBerenbachImage = "assets/clip03/dialog-family-johannes-berenbach.webp";
 const clip03FamilyBurkhartBerenbachImage = "assets/clip03/dialog-family-burkhart-berenbach.webp";
 const clip03FamilyNothburgaNuwensteinImage = "assets/clip03/dialog-family-nothburga-nuwenstein.webp";
+const clip03BorderKnightLeftImage = "assets/clip03/border-knight-left-red.webp";
+const clip03BorderKnightRightImage = "assets/clip03/border-knight-right-blue.webp";
 
 const clip02Soundtrack = new Audio("assets/clip02/soundtrack.mp3");
 clip02Soundtrack.preload = "auto";
@@ -357,6 +359,10 @@ function createClip03StaticSymbolIn(container, config) {
     img.classList.add("is-mirrored");
   }
 
+  if (config.role) {
+    img.dataset.clip03Role = config.role;
+  }
+
   img.src = config.src;
   img.alt = "";
   img.draggable = false;
@@ -392,7 +398,8 @@ function buildClip03FinalScene(container) {
     width: "7.0vw",
     x: 4.6,
     y: 8.1,
-    scale: .72
+    scale: .72,
+    role: "helmet-left"
   });
 
   createClip03StaticSymbolIn(container, {
@@ -401,7 +408,8 @@ function buildClip03FinalScene(container) {
     x: 95.0,
     y: 8.1,
     scale: .72,
-    mirrored: true
+    mirrored: true,
+    role: "helmet-right"
   });
 
   createClip03StaticSymbolIn(container, {
@@ -409,7 +417,8 @@ function buildClip03FinalScene(container) {
     width: "10.2vw",
     x: 4.3,
     y: 50.2,
-    scale: .88
+    scale: .88,
+    role: "sword-left"
   });
 
   createClip03StaticSymbolIn(container, {
@@ -417,7 +426,8 @@ function buildClip03FinalScene(container) {
     width: "10.2vw",
     x: 95.3,
     y: 50.2,
-    scale: .88
+    scale: .88,
+    role: "sword-right"
   });
 
   createClip03StaticSymbolIn(container, {
@@ -425,7 +435,8 @@ function buildClip03FinalScene(container) {
     width: "8.7vw",
     x: 5.2,
     y: 91.6,
-    scale: .64
+    scale: .64,
+    role: "crest-left"
   });
 
   createClip03StaticSymbolIn(container, {
@@ -433,7 +444,8 @@ function buildClip03FinalScene(container) {
     width: "8.5vw",
     x: 94.4,
     y: 91.4,
-    scale: .68
+    scale: .68,
+    role: "crest-right"
   });
 
   createClip03StaticSymbolIn(container, {
@@ -1003,6 +1015,104 @@ function hideClip03WaldstrasseElement(el) {
   el.classList.add("is-fading-out");
 }
 
+
+function getClip03BorderSymbol(layer, role) {
+  return layer?.querySelector(`.clip03-symbol[data-clip03-role="${role}"]`) || null;
+}
+
+function createClip03BorderSmoke(layer, className) {
+  return createClip03LargeSmoke(layer, `clip03-large-smoke--border ${className}`);
+}
+
+function createClip03BorderKnights(layer) {
+  const left = document.createElement("div");
+  left.className = "clip03-border-knight clip03-border-knight--left";
+  left.innerHTML = `<img src="${clip03BorderKnightLeftImage}" alt="" draggable="false">`;
+
+  const right = document.createElement("div");
+  right.className = "clip03-border-knight clip03-border-knight--right";
+  right.innerHTML = `<img src="${clip03BorderKnightRightImage}" alt="" draggable="false">`;
+
+  layer.append(left, right);
+
+  requestAnimationFrame(() => {
+    left.classList.add("is-visible");
+    right.classList.add("is-visible");
+  });
+
+  return { left, right };
+}
+
+async function playClip03BorderCollapse(layer, token) {
+  if (token !== clip03RunToken) return;
+
+  const swordLeft = getClip03BorderSymbol(layer, "sword-left");
+  const swordRight = getClip03BorderSymbol(layer, "sword-right");
+  const helmetLeft = getClip03BorderSymbol(layer, "helmet-left");
+  const helmetRight = getClip03BorderSymbol(layer, "helmet-right");
+  const crestLeft = getClip03BorderSymbol(layer, "crest-left");
+  const crestRight = getClip03BorderSymbol(layer, "crest-right");
+
+  const six = [helmetLeft, helmetRight, swordLeft, swordRight, crestLeft, crestRight].filter(Boolean);
+  if (six.length !== 6) return;
+
+  // Erst beide Schwerter gleichzeitig ca. 1 cm nach innen schieben.
+  swordLeft.classList.add("clip03-border-sword", "clip03-border-sword--left", "is-inset");
+  swordRight.classList.add("clip03-border-sword", "clip03-border-sword--right", "is-inset");
+
+  if (!(await waitClip03(1050, token))) return;
+
+  // Danach langsam um 90° in die Mitte drehen:
+  // links zeigt nach rechts, rechts gespiegelt nach links.
+  swordLeft.classList.add("is-horizontal");
+  swordRight.classList.add("is-horizontal");
+
+  if (!(await waitClip03(1700, token))) return;
+
+  // Nun obere Helme nach unten und untere Seitenwappen nach oben.
+  // Zielpositionen lassen bewusst ungefähr 1 cm Luft zwischen Helm und Wappen.
+  helmetLeft.classList.add("clip03-border-converge", "clip03-border-converge--helmet-left");
+  helmetRight.classList.add("clip03-border-converge", "clip03-border-converge--helmet-right");
+  crestLeft.classList.add("clip03-border-converge", "clip03-border-converge--crest-left");
+  crestRight.classList.add("clip03-border-converge", "clip03-border-converge--crest-right");
+
+  requestAnimationFrame(() => {
+    helmetLeft.classList.add("is-converged");
+    helmetRight.classList.add("is-converged");
+    crestLeft.classList.add("is-converged");
+    crestRight.classList.add("is-converged");
+  });
+
+  if (!(await waitClip03(2600, token))) return;
+
+  // Während alle sechs Symbole weich verschwinden, kommen hinter dem Rauch
+  // die beiden neuen Ritter herein.
+  const knights = createClip03BorderKnights(layer);
+
+  const smokes = [
+    createClip03BorderSmoke(layer, "clip03-border-smoke--helmet-left"),
+    createClip03BorderSmoke(layer, "clip03-border-smoke--sword-left"),
+    createClip03BorderSmoke(layer, "clip03-border-smoke--crest-left"),
+    createClip03BorderSmoke(layer, "clip03-border-smoke--helmet-right"),
+    createClip03BorderSmoke(layer, "clip03-border-smoke--sword-right"),
+    createClip03BorderSmoke(layer, "clip03-border-smoke--crest-right")
+  ];
+
+  six.forEach((el) => el.classList.add("is-border-dissolving"));
+
+  if (!(await waitClip03(1100, token))) return;
+  six.forEach((el) => el.remove());
+
+  // Rauch bleibt groß liegen und zieht anschließend langsam/smooth weg.
+  smokes.forEach((smoke) => smoke.classList.add("is-ending"));
+
+  if (!(await waitClip03(3000, token))) return;
+  smokes.forEach((smoke) => smoke.remove());
+
+  // Beide neuen Ritter bleiben ab hier stehen.
+  return knights;
+}
+
 async function playClip03WaldstrasseFamily(d, token) {
   if (token !== clip03RunToken) return;
 
@@ -1038,6 +1148,15 @@ async function playClip03WaldstrasseFamily(d, token) {
     family.nothburga,
     family.rings
   ].forEach(hideClip03WaldstrasseElement);
+
+  // Warten, bis diese Familie wirklich komplett weggefadet ist.
+  if (!(await waitClip03(900, token))) return;
+
+  // Danach bleibt nur der Mittelcharakter exakt 2 Sekunden stehen.
+  if (!(await waitClip03(2000, token))) return;
+
+  // Anschließend startet die neue Rand-Symbol-/Rittersequenz.
+  await playClip03BorderCollapse(d.scene.closest(".clip03-animation-layer") || getClip03Layer(), token);
 }
 
 async function flickerClip03Center(d, layer, token) {
@@ -1272,7 +1391,9 @@ async function playClip03() {
     clip03DialogGoatImage03,
     clip03FamilyJohannesBerenbachImage,
     clip03FamilyBurkhartBerenbachImage,
-    clip03FamilyNothburgaNuwensteinImage
+    clip03FamilyNothburgaNuwensteinImage,
+    clip03BorderKnightLeftImage,
+    clip03BorderKnightRightImage
   ].forEach((src) => {
     const preload = new Image();
     preload.src = src;
