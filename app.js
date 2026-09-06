@@ -1027,8 +1027,8 @@ async function playClip03WaldstrasseFamily(d, token) {
   if (!(await waitClip03(1000, token))) return;
   showClip03WaldstrasseElement(family.rings);
 
-  // Sobald alles vollständig eingeblendet ist: 5 Sekunden stehen lassen.
-  if (!(await waitClip03(5000, token))) return;
+  // Sobald alles vollständig eingeblendet ist: jetzt 10 Sekunden stehen lassen.
+  if (!(await waitClip03(10000, token))) return;
 
   // Alles außer dem Mittelcharakter selbst fadet gemeinsam smooth heraus.
   [
