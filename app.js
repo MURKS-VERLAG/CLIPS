@@ -12,6 +12,9 @@ const clip02Timers = new Set();
 
 let clip03RunToken = 0;
 const clip03Timers = new Set();
+
+let clip04RunToken = 0;
+const clip04Timers = new Set();
 const clip03Soundtrack = new Audio("assets/clip03/lumen-in-tenebris.mp3");
 clip03Soundtrack.preload = "auto";
 clip03Soundtrack.volume = 1;
@@ -146,6 +149,10 @@ function getClip02Layer() {
 
 function getClip03Layer() {
   return document.getElementById("clip03AnimationLayer");
+}
+
+function getClip04Layer() {
+  return document.getElementById("clip04AnimationLayer");
 }
 
 const clip02Images = [
@@ -1753,6 +1760,65 @@ async function playClip03() {
   tick();
 }
 
+
+function waitClip04(ms, token) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      clip04Timers.delete(timer);
+      resolve(token === clip04RunToken);
+    }, ms);
+    clip04Timers.add(timer);
+  });
+}
+
+function stopClip04Animation() {
+  clip04RunToken += 1;
+
+  clip04Timers.forEach((timer) => clearTimeout(timer));
+  clip04Timers.clear();
+
+  const layer = getClip04Layer();
+  if (layer) layer.innerHTML = "";
+}
+
+async function playClip04() {
+  stopClip04Animation();
+  const token = clip04RunToken;
+  const layer = getClip04Layer();
+  if (!layer) return;
+
+  layer.innerHTML = "";
+
+  const scene = document.createElement("div");
+  scene.className = "clip04-iris-scene";
+
+  const background = document.createElement("img");
+  background.className = "clip04-scene-background";
+  background.src = "assets/clip-frame-grid.png";
+  background.alt = "";
+  background.draggable = false;
+
+  const character = document.createElement("img");
+  character.className = "clip04-character";
+  character.src = "assets/clip04/hooded-character.webp";
+  character.alt = "";
+  character.draggable = false;
+
+  scene.append(background, character);
+  layer.appendChild(scene);
+
+  // Bild bleibt zunächst vollständig schwarz.
+  if (!(await waitClip04(500, token))) return;
+
+  // Danach öffnet sich die Iris langsam in exakt 2 Sekunden von innen nach außen.
+  requestAnimationFrame(() => scene.classList.add("is-revealing"));
+
+  if (!(await waitClip04(2050, token))) return;
+
+  // Nach der Iris bleibt die komplette Szene unverändert stehen.
+  scene.classList.add("is-revealed");
+}
+
 function getFrameForClip(clipNumber) {
   if (clipNumber >= 21 && clipNumber <= 40) {
     return "assets/clip-frame-grid.png";
@@ -2190,14 +2256,25 @@ function openClip(clipNumber) {
   stopClip01Animation();
   stopClip02Animation();
   stopClip03Animation();
+  stopClip04Animation();
+  stopClip04Animation();
 
   clipStage.dataset.activeClip = String(clipNumber);
+
+  // Jeder Clip startet mit normal sichtbarem Stage-Hintergrund;
+  // Clip 04 schaltet ihn unten gezielt aus, damit die Iris aus Schwarz startet.
+  clipStageBackground.style.opacity = "1";
 
   if (clipNumber === 1) {
     clipStageBackground.src = "assets/clip01/frame-clean.png";
   } else if (clipNumber === 2) {
     // Clip 02: ursprünglicher Goldrahmen bleibt permanent als Hintergrund sichtbar.
     clipStageBackground.src = "assets/clip-frame.png";
+  } else if (clipNumber === 4) {
+    // Clip 04 verwendet exakt den bereits hinterlegten Rahmen von Clip 21–40.
+    // Der sichtbare Aufbau geschieht innerhalb der Iris-Szene; Stage darunter bleibt schwarz.
+    clipStageBackground.src = "assets/clip-frame-grid.png";
+    clipStageBackground.style.opacity = "0";
   } else {
     clipStageBackground.src = getFrameForClip(clipNumber);
   }
@@ -2215,6 +2292,8 @@ function openClip(clipNumber) {
     requestAnimationFrame(() => playClip02());
   } else if (clipNumber === 3) {
     requestAnimationFrame(() => playClip03());
+  } else if (clipNumber === 4) {
+    requestAnimationFrame(() => playClip04());
   }
 }
 

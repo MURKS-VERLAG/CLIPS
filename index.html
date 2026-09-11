@@ -1622,6 +1622,76 @@
       }
     }
 
+
+    /* CLIP 04: Graphpapier-Rahmen (wie Clip 21–40) + zentrale Figur + Iris aus Schwarz. */
+    .clip04-animation-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 16;
+      overflow: hidden;
+      pointer-events: none;
+      background: #000;
+    }
+
+    .clip04-iris-scene {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      clip-path: circle(0% at 50% 50%);
+      -webkit-clip-path: circle(0% at 50% 50%);
+      will-change: clip-path;
+    }
+
+    .clip04-iris-scene.is-revealing {
+      animation: clip04IrisReveal 2s cubic-bezier(.42,0,.18,1) forwards;
+    }
+
+    .clip04-iris-scene.is-revealed {
+      clip-path: circle(150vmax at 50% 50%);
+      -webkit-clip-path: circle(150vmax at 50% 50%);
+    }
+
+    @keyframes clip04IrisReveal {
+      0% {
+        clip-path: circle(0% at 50% 50%);
+        -webkit-clip-path: circle(0% at 50% 50%);
+      }
+      100% {
+        clip-path: circle(150vmax at 50% 50%);
+        -webkit-clip-path: circle(150vmax at 50% 50%);
+      }
+    }
+
+    .clip04-scene-background {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      object-position: center center;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .clip04-character {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      z-index: 2;
+      display: block;
+      width: min(24vw, 370px);
+      max-height: 68vh;
+      height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: contain;
+      object-position: center center;
+      user-select: none;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,.55));
+    }
+
 </style>
 </head>
 
@@ -1671,8 +1741,9 @@
     <div id="clip01AnimationLayer" class="clip01-animation-layer"></div>
     <div id="clip02AnimationLayer" class="clip02-animation-layer"></div>
     <div id="clip03AnimationLayer" class="clip03-animation-layer"></div>
+    <div id="clip04AnimationLayer" class="clip04-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip03-handvision-up-01"></script>
+  <script src="app.js?v=clip04-iris-01"></script>
 </body>
 </html>
