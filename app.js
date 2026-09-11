@@ -2257,7 +2257,6 @@ function openClip(clipNumber) {
   stopClip02Animation();
   stopClip03Animation();
   stopClip04Animation();
-  stopClip04Animation();
 
   clipStage.dataset.activeClip = String(clipNumber);
 
@@ -2305,6 +2304,7 @@ function closeClip() {
   stopClip01Animation();
   stopClip02Animation();
   stopClip03Animation();
+  stopClip04Animation();
 
   clipStage.hidden = true;
   clipStage.style.setProperty("display", "none", "important");
