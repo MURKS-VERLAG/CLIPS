@@ -1845,7 +1845,7 @@ Eines Tages kam das Schlimmste: Eine Fehde zwischen den großen Herrn führte de
   // Schwarzphase bleibt 1,5 Sekunden; Iris danach unverändert 2 Sekunden.
   if (!(await waitClip04(1500, token))) return;
   requestAnimationFrame(() => scene.classList.add("is-revealing"));
-  if (!(await waitClip04(2050, token))) return;
+  if (!(await waitClip04(2000, token))) return;
   scene.classList.add("is-revealed");
 
   // Nach der Iris kommt wie ursprünglich SOFORT das Buch – zusammen mit der Musik.
