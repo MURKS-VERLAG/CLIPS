@@ -1824,33 +1824,41 @@ async function playClip04() {
   if (!layer) return;
   layer.innerHTML = "";
 
-  const scene = document.createElement("div");
-  scene.className = "clip04-iris-scene";
-  const background = document.createElement("img");
-  background.className = "clip04-scene-background";
-  background.src = "assets/clip04/frame-sagen.webp";
-  background.alt = ""; background.draggable = false;
-  const content = document.createElement("div");
-  content.className = "clip04-content-safe-zone";
-  const book = document.createElement("img");
-  book.className = "clip04-book"; book.src = "assets/clip04/sagen-des-renchtals-book.webp"; book.alt = ""; book.draggable = false;
-  const desk = document.createElement("img");
-  desk.className = "clip04-desk"; desk.src = "assets/clip04/sagen-desk.webp"; desk.alt = ""; desk.draggable = false;
-  content.append(book, desk); scene.append(background, content); layer.appendChild(scene);
+  const scene = document.createElement("div"); scene.className = "clip04-iris-scene";
+  const background = document.createElement("img"); background.className = "clip04-scene-background"; background.src = "assets/clip04/frame-sagen.webp"; background.alt = ""; background.draggable = false;
+  const content = document.createElement("div"); content.className = "clip04-content-safe-zone";
+  const book = document.createElement("img"); book.className = "clip04-book"; book.src = "assets/clip04/sagen-des-renchtals-book.webp"; book.alt = ""; book.draggable = false;
+  const desk = document.createElement("img"); desk.className = "clip04-desk"; desk.src = "assets/clip04/sagen-desk.webp"; desk.alt = ""; desk.draggable = false;
+  const crawlWindow = document.createElement("div"); crawlWindow.className = "clip04-crawl-window";
+  const crawl = document.createElement("div"); crawl.className = "clip04-crawl-text"; crawl.textContent = `Das Silberglöckchen
+Es war in der Zeit, als noch sumpfiger Wald im Renchtal stand und der wilde Fluß bald da, bald dort seinen Weg suchte. Die Straße lief oben die Höhe entlang, und nur selten durchstreifte ein Jäger die ungesunden Niederungen. Nur bis zum Getöse, der engen Talstelle, durch die sich der Fluß mit lautem Rauschen preßte, waren die Hirten in den Wald vorgedrungen. Dort stand auch die kleine hölzerne Kapelle, von der ein schmaler Pfad nach dem über dem Berge liegenden Kloster führte. Von den Höhen schaute die Neuenstein auf der Sohlbergseite und die Bärenburg vom Schärtenkopf her in den Urwald hinab.
 
-  if (!(await waitClip04(500, token))) return;
+Die Menschen waren eigentlich nicht anders als in unseren Tagen. In gleicher Weise schwellte Leid und Freude ihre Brust. Sie liebten ihre Heimat und liebten auch sich, sie bangten und litten, sie fühlten Sehnen und Zagen, sie haßten und kämpften — alles war in der wenig anderen Umgebung wie heute —.
+
+In jener Zeit lebte auf der Bärenburg ein Ritter, der eine schöne Tochter sein eigen nannte. Zu gleicher Zeit hauste ein edler Jüngling aus dem Geschlechte der Winterbach auf der Neuenstein, der dem Fräulein in Liebe zugetan war.
+
+Die Eltern waren beiderseits gegen eine Verbindung, da die Väter, verschiedenen Lehnsherren dienstpflichtig, einander feindlich gegenüberstanden. Es war kein Meer, das die Liebenden trennte, sondern nur ein Bach. Aber er schien so unüberwindlich wie jenes. Wenn Gunhild, die Bärenburgerin, auf der Burgzinne saß, über den weiten Wald blickte und leise die Weise des uralten Liebesliedes vor sich hinsummte: „Es waren zwei Königskinder, die hatten einander so lieb . . . sie konnten zusammen nicht kommen, das Wasser war viel zu tief“ . . . dann rannen ihr die Tränen über die Wangen, und die Nadelarbeit kam nicht weiter, weil das Mädchen zu oft mit dem Tüchlein die Augen wischen mußte.
+
+Eines Tages kam das Schlimmste: Eine Fehde zwischen den großen Herrn führte den alten Bärenburger und den jungen Neuensteiner in gegnerische Lager. Gunhild mußte um den Vater und den Geliebten zittern. Wie, wenn sich beide im Kampfe gegenüberstehen sollten? Wenn gar, was Gott verhüten möge, der eine von der Hand des anderen fallen würde? Sie wagte nicht, den Gedanken auszudenken. Hing sie doch an beiden mit gleicher Liebe und wäre ihr eines jeden Tod oder nur Verwundung fürchterlich gewesen.`;
+  crawlWindow.appendChild(crawl); content.append(book, desk, crawlWindow); scene.append(background, content); layer.appendChild(scene);
+
+  // Musik DIREKT beim Start von Clip 4.
+  try { clip04Soundtrack.currentTime = 0; clip04Soundtrack.volume = 1; const p = clip04Soundtrack.play(); if (p && typeof p.catch === "function") p.catch(() => {}); } catch (_) {}
+
+  // Schwarzphase jetzt insgesamt 1,5 Sekunden; Iris danach unverändert 2 Sekunden.
+  if (!(await waitClip04(1500, token))) return;
   requestAnimationFrame(() => scene.classList.add("is-revealing"));
   if (!(await waitClip04(2050, token))) return;
   scene.classList.add("is-revealed");
 
-  try { clip04Soundtrack.currentTime = 0; clip04Soundtrack.volume = 1; await clip04Soundtrack.play(); } catch (_) {}
-  if (token !== clip04RunToken) return;
+  // Buch fährt nun 5 Sekunden ein und verschwindet danach SOFORT ohne Standsekunde.
   requestAnimationFrame(() => book.classList.add("is-growing"));
-  if (!(await waitClip04(3000, token))) return;
-  if (!(await waitClip04(1000, token))) return;
+  if (!(await waitClip04(5000, token))) return;
   book.classList.add("is-fading-out");
   if (!(await waitClip04(700, token))) return;
-  requestAnimationFrame(() => desk.classList.add("is-visible"));
+
+  // Schreibtisch erscheint; Lauftext startet exakt mit seinem Einblenden.
+  requestAnimationFrame(() => { desk.classList.add("is-visible"); crawlWindow.classList.add("is-visible"); crawl.classList.add("is-running"); });
 }
 
 function getFrameForClip(clipNumber) {
