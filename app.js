@@ -1842,23 +1842,28 @@ Die Eltern waren beiderseits gegen eine Verbindung, da die Väter, verschiedenen
 Eines Tages kam das Schlimmste: Eine Fehde zwischen den großen Herrn führte den alten Bärenburger und den jungen Neuensteiner in gegnerische Lager. Gunhild mußte um den Vater und den Geliebten zittern. Wie, wenn sich beide im Kampfe gegenüberstehen sollten? Wenn gar, was Gott verhüten möge, der eine von der Hand des anderen fallen würde? Sie wagte nicht, den Gedanken auszudenken. Hing sie doch an beiden mit gleicher Liebe und wäre ihr eines jeden Tod oder nur Verwundung fürchterlich gewesen.`;
   crawlWindow.appendChild(crawl); content.append(book, desk, crawlWindow); scene.append(background, content); layer.appendChild(scene);
 
-  // Musik DIREKT beim Start von Clip 4.
-  try { clip04Soundtrack.currentTime = 0; clip04Soundtrack.volume = 1; const p = clip04Soundtrack.play(); if (p && typeof p.catch === "function") p.catch(() => {}); } catch (_) {}
-
-  // Schwarzphase jetzt insgesamt 1,5 Sekunden; Iris danach unverändert 2 Sekunden.
+  // Schwarzphase bleibt 1,5 Sekunden; Iris danach unverändert 2 Sekunden.
   if (!(await waitClip04(1500, token))) return;
   requestAnimationFrame(() => scene.classList.add("is-revealing"));
   if (!(await waitClip04(2050, token))) return;
   scene.classList.add("is-revealed");
 
-  // Buch fährt nun 5 Sekunden ein und verschwindet danach SOFORT ohne Standsekunde.
+  // Das große Schreibtischbild blendet schon 3 Sekunden VOR dem Buch smooth ein
+  // und liegt bewusst eine Ebene hinter dem Buch.
+  requestAnimationFrame(() => desk.classList.add("is-visible"));
+  if (!(await waitClip04(3000, token))) return;
+
+  // Musik startet jetzt exakt mit dem Spawn / Wachstum des Buches.
+  try { clip04Soundtrack.currentTime = 0; clip04Soundtrack.volume = 1; const p = clip04Soundtrack.play(); if (p && typeof p.catch === "function") p.catch(() => {}); } catch (_) {}
   requestAnimationFrame(() => book.classList.add("is-growing"));
+
+  // Buch fährt 5 Sekunden ein und verschwindet danach sofort ohne Standsekunde.
   if (!(await waitClip04(5000, token))) return;
   book.classList.add("is-fading-out");
   if (!(await waitClip04(700, token))) return;
 
-  // Schreibtisch erscheint; Lauftext startet exakt mit seinem Einblenden.
-  requestAnimationFrame(() => { desk.classList.add("is-visible"); crawlWindow.classList.add("is-visible"); crawl.classList.add("is-running"); });
+  // Sobald das Buch weg ist, startet der Lauftext auf dem bereits sichtbaren Schreibtisch.
+  requestAnimationFrame(() => { crawlWindow.classList.add("is-visible"); crawl.classList.add("is-running"); });
 }
 
 function getFrameForClip(clipNumber) {
