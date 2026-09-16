@@ -1635,11 +1635,11 @@
     .clip04-book {position:absolute;left:50%;top:50%;z-index:4;display:block;max-width:58%;max-height:88%;width:auto;height:auto;opacity:0;transform:translate(-50%,-50%) scale(.025);transform-origin:center;object-fit:contain;user-select:none;pointer-events:none;filter:drop-shadow(0 9px 18px rgba(0,0,0,.42));will-change:transform,opacity;}
     .clip04-book.is-growing {opacity:1;transform:translate(-50%,-50%) scale(1);transition:transform 5000ms cubic-bezier(.18,.72,.22,1),opacity 420ms ease-out;}
     .clip04-book.is-fading-out {opacity:0;transform:translate(-50%,-50%) scale(.985);transition:opacity 650ms ease-in-out,transform 650ms ease-in-out;}
-    .clip04-desk {position:absolute;left:50%;bottom:-5.5%;z-index:2;display:block;max-width:108%;max-height:91%;width:auto;height:auto;opacity:0;transform:translateX(-50%) translateY(1.5%) scale(.985);transform-origin:center bottom;object-fit:contain;object-position:center bottom;user-select:none;pointer-events:none;filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));transition:opacity 3000ms cubic-bezier(.2,.72,.25,1),transform 3000ms cubic-bezier(.2,.72,.25,1);}
+    .clip04-desk {position:absolute;left:50%;bottom:-24%;z-index:2;display:block;max-width:108%;max-height:91%;width:auto;height:auto;opacity:0;transform:translateX(-50%) translateY(1.5%) scale(.985);transform-origin:center bottom;object-fit:contain;object-position:center bottom;user-select:none;pointer-events:none;filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));transition:opacity 3000ms cubic-bezier(.2,.72,.25,1),transform 3000ms cubic-bezier(.2,.72,.25,1);}
     .clip04-desk.is-visible {opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
 
     /* Clip 04 Lauftext: beginnt exakt an der oberen Tischkante und bleibt zwischen Kerze/Dolch. */
-    .clip04-crawl-window {position:absolute;left:50%;bottom:calc(34.5% - 1cm);z-index:5;width:calc(31% + 2cm);height:calc(39% + 2cm);transform:translateX(-50%);overflow:hidden;opacity:0;pointer-events:none;}
+    .clip04-crawl-window {position:absolute;left:50%;bottom:calc(34.5% - 1cm);z-index:5;width:calc(31% + 2cm);height:calc(39% + 3.5cm);transform:translateX(-50%);overflow:hidden;opacity:0;pointer-events:none;}
     .clip04-crawl-window.is-visible {opacity:1;}
     .clip04-crawl-text {position:absolute;left:0;top:100%;width:100%;box-sizing:border-box;margin:0;color:#080808;font-family:Arial,Helvetica,sans-serif;font-size:clamp(12px,1.12vw,21px);font-weight:500;line-height:1.34;text-align:left;white-space:pre-wrap;will-change:transform;}
     .clip04-crawl-text::first-line {font-weight:800;font-size:1.22em;}
@@ -1698,6 +1698,6 @@
     <div id="clip04AnimationLayer" class="clip04-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip04-lauftext-03"></script>
+  <script src="app.js?v=clip04-lauftext-04"></script>
 </body>
 </html>

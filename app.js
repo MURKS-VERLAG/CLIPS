@@ -1848,14 +1848,13 @@ Eines Tages kam das Schlimmste: Eine Fehde zwischen den großen Herrn führte de
   if (!(await waitClip04(2050, token))) return;
   scene.classList.add("is-revealed");
 
-  // Das große Schreibtischbild blendet schon 3 Sekunden VOR dem Buch smooth ein
-  // und liegt bewusst eine Ebene hinter dem Buch.
-  requestAnimationFrame(() => desk.classList.add("is-visible"));
-  if (!(await waitClip04(3000, token))) return;
-
-  // Musik startet jetzt exakt mit dem Spawn / Wachstum des Buches.
+  // Nach der Iris kommt wie ursprünglich SOFORT das Buch – zusammen mit der Musik.
+  // Der Schreibtisch beginnt zeitgleich dahinter weich einzufaden; die bestehenden Effekte bleiben erhalten.
   try { clip04Soundtrack.currentTime = 0; clip04Soundtrack.volume = 1; const p = clip04Soundtrack.play(); if (p && typeof p.catch === "function") p.catch(() => {}); } catch (_) {}
-  requestAnimationFrame(() => book.classList.add("is-growing"));
+  requestAnimationFrame(() => {
+    book.classList.add("is-growing");
+    desk.classList.add("is-visible");
+  });
 
   // Buch fährt 5 Sekunden ein und verschwindet danach sofort ohne Standsekunde.
   if (!(await waitClip04(5000, token))) return;
