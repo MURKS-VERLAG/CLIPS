@@ -15,6 +15,9 @@ const clip03Timers = new Set();
 
 let clip04RunToken = 0;
 const clip04Timers = new Set();
+const clip04Soundtrack = new Audio("assets/clip04/stained-glass.mp3");
+clip04Soundtrack.preload = "auto";
+clip04Soundtrack.volume = 1;
 const clip03Soundtrack = new Audio("assets/clip03/lumen-in-tenebris.mp3");
 clip03Soundtrack.preload = "auto";
 clip03Soundtrack.volume = 1;
@@ -1805,6 +1808,11 @@ function stopClip04Animation() {
   clip04Timers.forEach((timer) => clearTimeout(timer));
   clip04Timers.clear();
 
+  try {
+    clip04Soundtrack.pause();
+    clip04Soundtrack.currentTime = 0;
+  } catch (_) {}
+
   const layer = getClip04Layer();
   if (layer) layer.innerHTML = "";
 }
@@ -1814,37 +1822,35 @@ async function playClip04() {
   const token = clip04RunToken;
   const layer = getClip04Layer();
   if (!layer) return;
-
   layer.innerHTML = "";
 
   const scene = document.createElement("div");
   scene.className = "clip04-iris-scene";
-
   const background = document.createElement("img");
   background.className = "clip04-scene-background";
-  background.src = "assets/clip-frame-grid.png";
-  background.alt = "";
-  background.draggable = false;
+  background.src = "assets/clip04/frame-sagen.webp";
+  background.alt = ""; background.draggable = false;
+  const content = document.createElement("div");
+  content.className = "clip04-content-safe-zone";
+  const book = document.createElement("img");
+  book.className = "clip04-book"; book.src = "assets/clip04/sagen-des-renchtals-book.webp"; book.alt = ""; book.draggable = false;
+  const desk = document.createElement("img");
+  desk.className = "clip04-desk"; desk.src = "assets/clip04/sagen-desk.webp"; desk.alt = ""; desk.draggable = false;
+  content.append(book, desk); scene.append(background, content); layer.appendChild(scene);
 
-  const character = document.createElement("img");
-  character.className = "clip04-character";
-  character.src = "assets/clip04/hooded-character.webp";
-  character.alt = "";
-  character.draggable = false;
-
-  scene.append(background, character);
-  layer.appendChild(scene);
-
-  // Bild bleibt zunächst vollständig schwarz.
   if (!(await waitClip04(500, token))) return;
-
-  // Danach öffnet sich die Iris langsam in exakt 2 Sekunden von innen nach außen.
   requestAnimationFrame(() => scene.classList.add("is-revealing"));
-
   if (!(await waitClip04(2050, token))) return;
-
-  // Nach der Iris bleibt die komplette Szene unverändert stehen.
   scene.classList.add("is-revealed");
+
+  try { clip04Soundtrack.currentTime = 0; clip04Soundtrack.volume = 1; await clip04Soundtrack.play(); } catch (_) {}
+  if (token !== clip04RunToken) return;
+  requestAnimationFrame(() => book.classList.add("is-growing"));
+  if (!(await waitClip04(3000, token))) return;
+  if (!(await waitClip04(1000, token))) return;
+  book.classList.add("is-fading-out");
+  if (!(await waitClip04(700, token))) return;
+  requestAnimationFrame(() => desk.classList.add("is-visible"));
 }
 
 function getFrameForClip(clipNumber) {
