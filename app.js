@@ -19,6 +19,28 @@ const clip03Soundtrack = new Audio("assets/clip03/lumen-in-tenebris.mp3");
 clip03Soundtrack.preload = "auto";
 clip03Soundtrack.volume = 1;
 
+const clip03Sounds = {
+  musicEnd: new Audio("assets/clip03/sound-dj-scratch-cut.mp3"),
+  johannRide: new Audio("assets/clip03/sound-evil-laugh.mp3"),
+  goatChange: new Audio("assets/clip03/sound-goat-scream.mp3")
+};
+Object.values(clip03Sounds).forEach((audio) => { audio.preload = "auto"; audio.volume = 1; });
+
+function playClip03Sound(name) {
+  const audio = clip03Sounds[name];
+  if (!audio) return;
+  try {
+    audio.pause(); audio.currentTime = 0; audio.volume = 1;
+    const p = audio.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  } catch (_) {}
+}
+function stopClip03Sounds() {
+  Object.values(clip03Sounds).forEach((audio) => {
+    try { audio.pause(); audio.currentTime = 0; } catch (_) {}
+  });
+}
+
 const clip03GedoresImage = "assets/clip03/gedoes-hubacker.webp";
 const clip03NuwensteinImage = "assets/clip03/nuwenstein.webp";
 const clip03BerenbachImage = "assets/clip03/berenbach.webp";
@@ -358,6 +380,8 @@ function stopClip03Animation() {
     clip03Soundtrack.pause();
     clip03Soundtrack.currentTime = 0;
   } catch (_) {}
+
+  stopClip03Sounds();
 
   const layer = getClip03Layer();
   if (layer) layer.innerHTML = "";
@@ -939,6 +963,7 @@ async function playClip03GoatReaction(layer, token) {
   goat.classList.add("clip03-dialog-goat");
   goat.classList.remove("is-mirrored");
   goat.src = clip03DialogGoatImage01;
+  playClip03Sound("goatChange");
 
   if (!(await waitClip03(800, token))) return;
   goat.classList.add("is-mirrored");
@@ -1329,6 +1354,7 @@ async function playClip03PostPuffDialogue(layer, token) {
   setClip03DialogImage(d.left, clip03DialogLeftImage03);
   setClip03DialogImage(d.right, clip03DialogRightImage03);
   showClip03DialogElement(d.centerReveal);
+  playClip03Sound("johannRide");
 
   // Schon kurz nachdem der Mittelcharakter sichtbar hochgefahren ist,
   // verschwinden links/rechts weich und werden von großem Rauch ersetzt.
@@ -1693,6 +1719,8 @@ async function playClip03() {
       try {
         clip03Soundtrack.pause();
       } catch (_) {}
+
+      playClip03Sound("musicEnd");
 
       const questionMark = createClip03QuestionMark(layer);
 
