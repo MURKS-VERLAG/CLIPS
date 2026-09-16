@@ -1649,6 +1649,13 @@
     .clip04-cue-image--left {right:calc(50% + 19vw);}
     .clip04-cue-image--right {left:calc(50% + 19vw);}
     .clip04-cue-image.is-visible {opacity:1;transform:translateY(-50%) scale(1);}
+    .clip04-herren-swords {position:absolute;top:50%;z-index:9;width:min(13vw,230px);height:min(31vh,310px);transform:translateY(-50%) scale(.94);opacity:0;transition:opacity 520ms ease-in-out,transform 520ms ease-in-out;pointer-events:none;filter:grayscale(1) contrast(1.35) drop-shadow(0 5px 9px rgba(0,0,0,.5));}
+    .clip04-herren-swords--left {right:calc(50% + 22vw);}
+    .clip04-herren-swords--right {left:calc(50% + 22vw);}
+    .clip04-herren-swords.is-visible {opacity:1;transform:translateY(-50%) scale(1);}
+    .clip04-herren-sword {position:absolute;left:50%;top:50%;width:78%;height:auto;transform-origin:center center;}
+    .clip04-herren-sword--a {transform:translate(-50%,-50%) rotate(45deg);}
+    .clip04-herren-sword--b {transform:translate(-50%,-50%) scaleX(-1) rotate(45deg);}
     @keyframes clip04TextCrawl {from{transform:translateY(0);}to{transform:translateY(calc(-100% - 42vh));}}
 
 </style>
@@ -1703,6 +1710,6 @@
     <div id="clip04AnimationLayer" class="clip04-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip04-cues-sequential-02"></script>
+  <script src="app.js?v=clip04-herren-wappen-01"></script>
 </body>
 </html>

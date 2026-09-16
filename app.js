@@ -1839,7 +1839,7 @@ In jener Zeit lebte auf der Bärenburg ein Ritter, der eine schöne Tochter sein
 
 Die Eltern waren beiderseits <span class="clip04-crawl-highlight">gegen eine Verbindung</span>, da die Väter, <span class="clip04-crawl-highlight">verschiedenen Lehnsherren dienstpflichtig</span>, einander <span class="clip04-crawl-highlight">feindlich</span> gegenüberstanden. Es war kein Meer, das die Liebenden trennte, sondern <span class="clip04-crawl-highlight">nur ein Bach</span>. Aber er schien so unüberwindlich wie jenes. Wenn Gunhild, die Bärenburgerin, auf der Burgzinne saß, über den weiten Wald blickte und leise die Weise des uralten Liebesliedes vor sich hinsummte: „Es waren zwei <span class="clip04-crawl-highlight">Königskinder</span>, die hatten einander so lieb . . . sie konnten zusammen nicht kommen, das Wasser war viel zu tief“ . . . dann rannen ihr die Tränen über die Wangen, und die Nadelarbeit kam nicht weiter, weil das Mädchen zu oft mit dem Tüchlein die Augen wischen mußte.
 
-Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde zwischen den großen Herrn führte den alten Bärenburger und den jungen Neuensteiner in gegnerische Lager</span>. Gunhild mußte um den Vater und den Geliebten zittern. Wie, wenn sich beide im Kampfe gegenüberstehen sollten? Wenn gar, was Gott verhüten möge, der eine von der Hand des anderen fallen würde? Sie wagte nicht, den Gedanken auszudenken. Hing sie doch an beiden mit gleicher Liebe und wäre ihr eines jeden Tod oder nur Verwundung fürchterlich gewesen.`;
+Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde zwischen den <span data-clip04-cue="herren">großen Herrn</span> führte den alten Bärenburger und den jungen Neuensteiner in gegnerische Lager</span>. Gunhild mußte um den Vater und den Geliebten zittern. Wie, wenn sich beide im Kampfe gegenüberstehen sollten? Wenn gar, was Gott verhüten möge, der eine von der Hand des anderen fallen würde? Sie wagte nicht, den Gedanken auszudenken. Hing sie doch an beiden mit gleicher Liebe und wäre ihr eines jeden Tod oder nur Verwundung fürchterlich gewesen.`;
   crawlWindow.appendChild(crawl); content.append(book, desk, crawlWindow); scene.append(background, content); layer.appendChild(scene);
 
   const clip04CueImages = {
@@ -1848,7 +1848,9 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
     kloster: ["assets/clip04/cue-kloster.png", "left"],
     // Positionen bewusst getauscht: Bärenburg links, Neuenstein rechts.
     neuenstein: ["assets/clip04/cue-neuenstein.png", "right"],
-    baerenburg: ["assets/clip04/cue-baerenburg.png", "left"]
+    baerenburg: ["assets/clip04/cue-baerenburg.png", "left"],
+    herrenLeft: ["assets/clip04/cue-herren-left.png", "left"],
+    herrenRight: ["assets/clip04/cue-herren-right.png", "right"]
   };
   const clip04CueState = new Set();
   const clip04CueElements = {};
@@ -1863,6 +1865,19 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
     content.appendChild(img); clip04CueElements[key] = img;
   });
 
+  // Zwei gekreuzte Schwarz-Weiß-Schwerter über jedem Herren-Wappen.
+  const clip04HerrenSwords = {};
+  ["left", "right"].forEach((side) => {
+    const group = document.createElement("div");
+    group.className = `clip04-herren-swords clip04-herren-swords--${side}`;
+    group.innerHTML = `
+      <img class="clip04-herren-sword clip04-herren-sword--a" src="assets/clip01/sword.png" alt="" draggable="false">
+      <img class="clip04-herren-sword clip04-herren-sword--b" src="assets/clip01/sword.png" alt="" draggable="false">
+    `;
+    content.appendChild(group);
+    clip04HerrenSwords[side] = group;
+  });
+
   const runClip04CueQueue = async () => {
     if (clip04CueBusy || token !== clip04RunToken) return;
     clip04CueBusy = true;
@@ -1872,8 +1887,19 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
       const images = keys.map((key) => clip04CueElements[key]).filter(Boolean);
       images.forEach((img) => requestAnimationFrame(() => img.classList.add("is-visible")));
 
-      // Jedes Bild / Bildpaar steht 3 Sekunden sichtbar.
-      if (!(await waitClip04(3000, token))) return;
+      const isHerrenPair = keys.includes("herrenLeft") || keys.includes("herrenRight");
+
+      if (isHerrenPair) {
+        // Herren-Wappen insgesamt 8 Sekunden. Nach 4 Sekunden kommen die Schwerter dazu.
+        if (!(await waitClip04(4000, token))) return;
+        Object.values(clip04HerrenSwords).forEach((group) => group.classList.add("is-visible"));
+        if (!(await waitClip04(4000, token))) return;
+        Object.values(clip04HerrenSwords).forEach((group) => group.classList.remove("is-visible"));
+      } else {
+        // Alle bisherigen Bildgruppen bleiben exakt 3 Sekunden sichtbar.
+        if (!(await waitClip04(3000, token))) return;
+      }
+
       images.forEach((img) => img.classList.remove("is-visible"));
 
       // Erst vollständig ausfaden, dann darf die nächste Bildgruppe erscheinen.
@@ -1884,7 +1910,9 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
   };
 
   const queueClip04Cue = (key) => {
-    if (key === "neuenstein" || key === "baerenburg") {
+    if (key === "herren") {
+      clip04CueQueue.push(["herrenLeft", "herrenRight"]);
+    } else if (key === "neuenstein" || key === "baerenburg") {
       if (clip04CastlePairQueued) return;
       clip04CastlePairQueued = true;
       // Die beiden Burgen bleiben das gewollte gleichzeitige Paar – jetzt mit getauschten Seiten.
