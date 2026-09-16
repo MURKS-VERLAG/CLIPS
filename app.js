@@ -18,6 +18,33 @@ const clip04Timers = new Set();
 const clip04Soundtrack = new Audio("assets/clip04/stained-glass.mp3");
 clip04Soundtrack.preload = "auto";
 clip04Soundtrack.volume = 1;
+
+const clip04Sounds = {
+  fehde: new Audio("assets/clip04/sound-fehde-hit.mp3"),
+  castles: new Audio("assets/clip04/sound-castles.mp3"),
+  fehdeFollow: new Audio("assets/clip04/sound-fehde-follow.mp3"),
+  churchBell: new Audio("assets/clip04/sound-church-bell-once.mp3")
+};
+Object.values(clip04Sounds).forEach((audio) => { audio.preload = "auto"; audio.volume = 1; });
+
+function playClip04Sound(name, onEnded = null) {
+  const audio = clip04Sounds[name];
+  if (!audio) return;
+  try {
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 1;
+    audio.onended = typeof onEnded === "function" ? onEnded : null;
+    const p = audio.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  } catch (_) {}
+}
+
+function stopClip04Sounds() {
+  Object.values(clip04Sounds).forEach((audio) => {
+    try { audio.pause(); audio.currentTime = 0; audio.onended = null; } catch (_) {}
+  });
+}
 const clip03Soundtrack = new Audio("assets/clip03/lumen-in-tenebris.mp3");
 clip03Soundtrack.preload = "auto";
 clip03Soundtrack.volume = 1;
@@ -1813,6 +1840,8 @@ function stopClip04Animation() {
     clip04Soundtrack.currentTime = 0;
   } catch (_) {}
 
+  stopClip04Sounds();
+
   const layer = getClip04Layer();
   if (layer) layer.innerHTML = "";
 }
@@ -1831,15 +1860,15 @@ async function playClip04() {
   const desk = document.createElement("img"); desk.className = "clip04-desk"; desk.src = "assets/clip04/sagen-desk.webp"; desk.alt = ""; desk.draggable = false;
   const crawlWindow = document.createElement("div"); crawlWindow.className = "clip04-crawl-window";
   const crawl = document.createElement("div"); crawl.className = "clip04-crawl-text"; crawl.innerHTML = `Das Silberglöckchen
-Es war in der Zeit, als noch sumpfiger Wald im Renchtal stand und der wilde Fluß bald da, bald dort seinen Weg suchte. <span class="clip04-crawl-highlight" data-clip04-cue="strasse">Die Straße lief oben die Höhe entlang</span>, und nur selten durchstreifte ein Jäger die ungesunden Niederungen. Nur bis zum <span class="clip04-crawl-highlight" data-clip04-cue="gedoes">Getöse</span>, der engen Talstelle, durch die sich der Fluß mit lautem Rauschen preßte, waren die Hirten in den Wald vorgedrungen. Dort stand auch die kleine hölzerne Kapelle, von der ein schmaler Pfad nach <span class="clip04-crawl-highlight" data-clip04-cue="kloster">dem über dem Berge liegenden Kloster</span> führte. Von den Höhen schaute die <span class="clip04-crawl-highlight" data-clip04-cue="neuenstein">Neuenstein auf der Sohlbergseite</span> und <span class="clip04-crawl-highlight" data-clip04-cue="baerenburg">die Bärenburg vom Schärtenkopf</span> her in den Urwald hinab.
+Es war in der Zeit, als noch sumpfiger Wald im Renchtal stand und der wilde Fluß dort seinen Weg suchte. <span class="clip04-crawl-highlight" data-clip04-cue="strasse">Die Straße lief oben die Höhe entlang</span>, und nur selten durchstreifte ein Jäger die ungesunden Niederungen. Nur bis zum <span class="clip04-crawl-highlight" data-clip04-cue="gedoes">Getöse</span>, der engen Talstelle, durch die sich der Fluß mit lautem Rauschen preßte, waren die Hirten in den Wald vorgedrungen. Dort stand auch die kleine hölzerne Kapelle, von der ein schmaler Pfad nach <span class="clip04-crawl-highlight" data-clip04-cue="kloster">dem über dem Berge liegenden Kloster</span> führte. Von den Höhen schaute die <span class="clip04-crawl-highlight" data-clip04-cue="neuenstein">Neuenstein auf der Sohlbergseite</span> und <span class="clip04-crawl-highlight" data-clip04-cue="baerenburg">die Bärenburg vom Schärtenkopf</span> her in den Urwald hinab.
 
 Die Menschen waren eigentlich nicht anders als in unseren Tagen. In gleicher Weise schwellte Leid und Freude ihre Brust. Sie liebten ihre Heimat und liebten auch sich, sie bangten und litten, sie fühlten Sehnen und Zagen, sie haßten und kämpften — alles war in der wenig anderen Umgebung wie heute —.
 
 In jener Zeit lebte auf der Bärenburg ein Ritter, der eine schöne Tochter sein eigen nannte. Zu gleicher Zeit hauste ein edler Jüngling aus dem Geschlechte der Winterbach auf der Neuenstein, der dem Fräulein in Liebe zugetan war.
 
-Die Eltern waren beiderseits <span class="clip04-crawl-highlight">gegen eine Verbindung</span>, da die Väter, <span class="clip04-crawl-highlight">verschiedenen Lehnsherren dienstpflichtig</span>, einander <span class="clip04-crawl-highlight">feindlich</span> gegenüberstanden. Es war kein Meer, das die Liebenden trennte, sondern <span class="clip04-crawl-highlight">nur ein Bach</span>. Aber er schien so unüberwindlich wie jenes. Wenn Gunhild, die Bärenburgerin, auf der Burgzinne saß, über den weiten Wald blickte und leise die Weise des uralten Liebesliedes vor sich hinsummte: „Es waren zwei <span class="clip04-crawl-highlight">Königskinder</span>, die hatten einander so lieb . . . sie konnten zusammen nicht kommen, das Wasser war viel zu tief“ . . . dann rannen ihr die Tränen über die Wangen, und die Nadelarbeit kam nicht weiter, weil das Mädchen zu oft mit dem Tüchlein die Augen wischen mußte.
+Die Eltern waren beiderseits <span class="clip04-crawl-highlight">gegen eine Verbindung</span>, da die Väter, <span class="clip04-crawl-highlight"><span data-clip04-cue="herren">verschiedenen Lehnsherren</span> dienstpflichtig</span>, einander <span class="clip04-crawl-highlight">feindlich</span> gegenüberstanden. Es war kein Meer, das die Liebenden trennte, sondern <span class="clip04-crawl-highlight">nur ein Bach</span>. Aber er schien so unüberwindlich wie jenes. Wenn Gunhild, die Bärenburgerin, auf der Burgzinne saß, über den weiten Wald blickte und leise die Weise des uralten Liebesliedes vor sich hinsummte: „Es waren zwei <span class="clip04-crawl-highlight">Königskinder</span>, die hatten einander so lieb . . . sie konnten zusammen nicht kommen, das Wasser war viel zu tief“ . . . dann rannen ihr die Tränen über die Wangen, und die Nadelarbeit kam nicht weiter, weil das Mädchen zu oft mit dem Tüchlein die Augen wischen mußte.
 
-Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde zwischen den <span data-clip04-cue="herren">großen Herrn</span> führte den alten Bärenburger und den jungen Neuensteiner in gegnerische Lager</span>. Gunhild mußte um den Vater und den Geliebten zittern. Wie, wenn sich beide im Kampfe gegenüberstehen sollten? Wenn gar, was Gott verhüten möge, der eine von der Hand des anderen fallen würde? Sie wagte nicht, den Gedanken auszudenken. Hing sie doch an beiden mit gleicher Liebe und wäre ihr eines jeden Tod oder nur Verwundung fürchterlich gewesen.`;
+Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine <span data-clip04-cue="fehde">Fehde</span> zwischen den großen Herrn führte den alten Bärenburger und den jungen Neuensteiner in gegnerische Lager</span>. Gunhild mußte um den Vater und den Geliebten zittern. Wie, wenn sich beide im Kampfe gegenüberstehen sollten? Wenn gar, was Gott verhüten möge, der eine von der Hand des anderen fallen würde? Sie wagte nicht, den Gedanken auszudenken. Hing sie doch an beiden mit gleicher Liebe und wäre ihr eines jeden Tod oder nur Verwundung fürchterlich gewesen.`;
   crawlWindow.appendChild(crawl); content.append(book, desk, crawlWindow); scene.append(background, content); layer.appendChild(scene);
 
   const clip04CueImages = {
@@ -1887,18 +1916,14 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
       const images = keys.map((key) => clip04CueElements[key]).filter(Boolean);
       images.forEach((img) => requestAnimationFrame(() => img.classList.add("is-visible")));
 
-      const isHerrenPair = keys.includes("herrenLeft") || keys.includes("herrenRight");
+      const isCastlePair = keys.includes("baerenburg") || keys.includes("neuenstein");
+      const isKloster = keys.includes("kloster");
 
-      if (isHerrenPair) {
-        // Herren-Wappen insgesamt 8 Sekunden. Nach 4 Sekunden kommen die Schwerter dazu.
-        if (!(await waitClip04(4000, token))) return;
-        Object.values(clip04HerrenSwords).forEach((group) => group.classList.add("is-visible"));
-        if (!(await waitClip04(4000, token))) return;
-        Object.values(clip04HerrenSwords).forEach((group) => group.classList.remove("is-visible"));
-      } else {
-        // Alle bisherigen Bildgruppen bleiben exakt 3 Sekunden sichtbar.
-        if (!(await waitClip04(3000, token))) return;
-      }
+      if (isCastlePair) playClip04Sound("castles");
+      if (isKloster) playClip04Sound("churchBell");
+
+      // Alle normalen Bildgruppen bleiben exakt wie bisher 3 Sekunden sichtbar.
+      if (!(await waitClip04(3000, token))) return;
 
       images.forEach((img) => img.classList.remove("is-visible"));
 
@@ -1911,7 +1936,18 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
 
   const queueClip04Cue = (key) => {
     if (key === "herren") {
-      clip04CueQueue.push(["herrenLeft", "herrenRight"]);
+      // Ab „verschiedenen Lehnsherren“ bleiben beide Wappen bis kurz vor Textende stehen.
+      [clip04CueElements.herrenLeft, clip04CueElements.herrenRight].forEach((img) => {
+        if (img) requestAnimationFrame(() => img.classList.add("is-visible"));
+      });
+      return;
+    } else if (key === "fehde") {
+      // Ab „Fehde“ erscheinen die gekreuzten Schwerter. Sound 5 folgt direkt auf Sound 3.
+      Object.values(clip04HerrenSwords).forEach((group) => group.classList.add("is-visible"));
+      playClip04Sound("fehde", () => {
+        if (token === clip04RunToken) playClip04Sound("fehdeFollow");
+      });
+      return;
     } else if (key === "neuenstein" || key === "baerenburg") {
       if (clip04CastlePairQueued) return;
       clip04CastlePairQueued = true;
@@ -1960,7 +1996,20 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
   if (!(await waitClip04(700, token))) return;
 
   // Sobald das Buch weg ist, startet der Lauftext auf dem bereits sichtbaren Schreibtisch.
-  requestAnimationFrame(() => { crawlWindow.classList.add("is-visible"); crawl.classList.add("is-running"); requestAnimationFrame(watchClip04Cues); });
+  requestAnimationFrame(() => {
+    crawlWindow.classList.add("is-visible");
+    crawl.classList.add("is-running");
+    requestAnimationFrame(watchClip04Cues);
+
+    // Lauftext dauert 116 s: Wappen + Schwerter faden ca. 3 s vor Textende gemeinsam aus.
+    const fadeTimer = setTimeout(() => {
+      clip04Timers.delete(fadeTimer);
+      if (token !== clip04RunToken) return;
+      [clip04CueElements.herrenLeft, clip04CueElements.herrenRight].forEach((img) => img?.classList.remove("is-visible"));
+      Object.values(clip04HerrenSwords).forEach((group) => group.classList.remove("is-visible"));
+    }, 113000);
+    clip04Timers.add(fadeTimer);
+  });
 }
 
 function getFrameForClip(clipNumber) {
