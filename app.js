@@ -22,6 +22,9 @@ clip05PencilSound.volume = .72;
 const clip05SwordSlashSound = new Audio("assets/clip05/sword-slash.mp3");
 clip05SwordSlashSound.preload = "auto";
 clip05SwordSlashSound.volume = 1;
+const clip05KnightAppearSound = new Audio("assets/clip05/girlyscream_01.mp3");
+clip05KnightAppearSound.preload = "auto";
+clip05KnightAppearSound.volume = 1;
 
 function getClip05Layer() { return document.getElementById("clip05AnimationLayer"); }
 
@@ -51,6 +54,7 @@ function stopClip05Animation() {
   clip05Timers.clear();
   stopClip05PencilSound();
   try { clip05SwordSlashSound.pause(); clip05SwordSlashSound.currentTime = 0; } catch (_) {}
+  try { clip05KnightAppearSound.pause(); clip05KnightAppearSound.currentTime = 0; } catch (_) {}
   const layer = getClip05Layer();
   if (layer) layer.innerHTML = "";
 }
@@ -2201,8 +2205,15 @@ async function playClip05() {
     if (!(await waitClip05(90, token))) return;
   }
 
-  // Direkt nach Fertigstellung: Anhang 1 wächst links oben 2,5 s von winzig auf groß.
-  requestAnimationFrame(() => slashTop.classList.add("is-growing"));
+  // Direkt nach Fertigstellung: Anhang 1 kommt 2,5 s von oben links auf seine bisherige Endposition.
+  // Der neue Sound startet exakt in dem Moment, in dem Ritter 1 erscheint.
+  requestAnimationFrame(() => {
+    slashTop.classList.add("is-growing");
+    try {
+      clip05KnightAppearSound.pause(); clip05KnightAppearSound.currentTime = 0; clip05KnightAppearSound.volume = 1;
+      const p = clip05KnightAppearSound.play(); if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch (_) {}
+  });
   if (!(await waitClip05(2500, token))) return;
   if (!(await waitClip05(500, token))) return;
 

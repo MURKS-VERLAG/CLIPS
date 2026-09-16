@@ -1644,20 +1644,23 @@
     @keyframes clip05Dust{0%{opacity:.72;transform:translate(-50%,-50%) scale(.65);}100%{opacity:0;transform:translate(-50%,-50%) translate(-5px,8px) scale(1.9);}}100%{opacity:0;transform:translate(-8px,10px) scale(1.55);}}
 
     /* Clip 05: Ritter-Schnittfolge nach fertiger Zeichnung. */
-    .clip05-slash-knight{position:absolute;z-index:10;display:block;max-width:min(19.2vw,312px);max-height:36.8vh;width:auto;height:auto;object-fit:contain;pointer-events:none;user-select:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.42));}
-    .clip05-slash-knight--top{left:11%;top:10%;opacity:0;transform:scale(.025);transform-origin:center;transition:transform 2500ms linear,opacity 180ms ease-out;}
-    .clip05-slash-knight--top.is-growing{opacity:1;transform:scale(1);}
+    .clip05-slash-knight{position:absolute;z-index:10;display:block;max-width:min(16.32vw,265.2px);max-height:31.28vh;width:auto;height:auto;object-fit:contain;pointer-events:none;user-select:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.42));}
+    /* Ritter 1: gleiche Endposition wie bisher, aber Anflug klar von OBEN LINKS. */
+    .clip05-slash-knight--top{left:11%;top:10%;opacity:0;transform:translate(-70vw,-70vh) scale(.025);transform-origin:center;transition:transform 2500ms linear,opacity 180ms ease-out;}
+    .clip05-slash-knight--top.is-growing{opacity:1;transform:translate(0,0) scale(1);}
     .clip05-slash-knight--top.is-gone{display:none;}
     .clip05-slash-knight--bottom{right:11%;bottom:9%;opacity:0;transform:scale(1);}
     .clip05-slash-knight--bottom.is-visible{opacity:1;}
     .clip05-slash-knight--bottom.is-fading{opacity:0;transition:opacity 700ms ease-in-out;}
-    .clip05-slash-line{position:absolute;left:17%;top:17%;z-index:14;width:0;height:8px;border-radius:999px;opacity:0;transform:rotate(39deg);transform-origin:left center;background:repeating-linear-gradient(90deg,#111 0 24px,rgba(255,255,255,.96) 24px 36px,#111 36px 60px);box-shadow:0 0 0 2px rgba(255,255,255,.42),0 0 15px rgba(0,0,0,.72);pointer-events:none;}
-    .clip05-slash-line.is-cutting{animation:clip05SlashLine 1500ms ease-out forwards;}
-    @keyframes clip05SlashLine{0%{width:0;opacity:1;}22%{width:86vw;opacity:1;}72%{width:86vw;opacity:.9;}100%{width:86vw;opacity:0;}}
+    /* Sauberer echter Schwerthieb: dünne Schnittlinie + helle Klingenkante + kurzer Lichtschweif. */
+    .clip05-slash-line{position:absolute;left:19%;top:20%;z-index:14;width:0;height:4px;opacity:0;transform:rotate(37deg);transform-origin:left center;background:linear-gradient(to bottom,rgba(255,255,255,.98) 0 24%,rgba(225,225,225,.92) 25% 42%,rgba(18,18,18,.98) 43% 100%);box-shadow:0 -2px 4px rgba(255,255,255,.92),0 3px 5px rgba(0,0,0,.95),0 0 13px rgba(255,255,255,.48);pointer-events:none;}
+    .clip05-slash-line::before{content:"";position:absolute;left:0;top:-7px;width:100%;height:18px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.26),transparent);filter:blur(4px);opacity:.9;}
+    .clip05-slash-line::after{content:"";position:absolute;right:-18px;top:50%;width:34px;height:34px;border-radius:50%;transform:translateY(-50%) scaleX(1.8);background:radial-gradient(circle,rgba(255,255,255,.98) 0 8%,rgba(255,255,255,.62) 9% 25%,transparent 68%);filter:blur(1px);}
+    .clip05-slash-line.is-cutting{animation:clip05SlashLine 1500ms cubic-bezier(.12,.78,.18,1) forwards;}
+    @keyframes clip05SlashLine{0%{width:0;opacity:0;}5%{opacity:1;}18%{width:70vw;opacity:1;}46%{width:70vw;opacity:.96;}100%{width:70vw;opacity:0;}}
     .clip05-doodle-helmet{transform-box:fill-box;transform-origin:center;}
     .clip05-doodle-helmet.is-slashed-away{animation:clip05HelmetFly 1500ms cubic-bezier(.2,.72,.25,1) forwards;}
     @keyframes clip05HelmetFly{0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1);}100%{opacity:0;transform:translate(38vw,-34vh) rotate(760deg) scale(.72);}}
-
 
     /* CLIP 04: bestehende Iris + neuer Sagen-Hintergrund / sichere Inhaltszone. */
     .clip04-animation-layer {position:absolute;inset:0;z-index:16;display:none;overflow:hidden;pointer-events:none;background:#000;}
@@ -1747,6 +1750,6 @@
     <div id="clip05AnimationLayer" class="clip05-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip05-swordcut-sequence-01"></script>
+  <script src="app.js?v=clip05-clean-cut-smaller-scream-01"></script>
 </body>
 </html>
