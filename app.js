@@ -1831,7 +1831,7 @@ async function playClip04() {
   const desk = document.createElement("img"); desk.className = "clip04-desk"; desk.src = "assets/clip04/sagen-desk.webp"; desk.alt = ""; desk.draggable = false;
   const crawlWindow = document.createElement("div"); crawlWindow.className = "clip04-crawl-window";
   const crawl = document.createElement("div"); crawl.className = "clip04-crawl-text"; crawl.innerHTML = `Das Silberglöckchen
-Es war in der Zeit, als noch sumpfiger Wald im Renchtal stand und der wilde Fluß bald da, bald dort seinen Weg suchte. <span class="clip04-crawl-highlight">Die Straße lief oben die Höhe entlang</span>, und nur selten durchstreifte ein Jäger die ungesunden Niederungen. Nur bis zum <span class="clip04-crawl-highlight" data-clip04-cue="gedoes">Getöse</span>, der engen Talstelle, durch die sich der Fluß mit lautem Rauschen preßte, waren die Hirten in den Wald vorgedrungen. Dort stand auch die kleine hölzerne Kapelle, von der ein schmaler Pfad nach <span class="clip04-crawl-highlight" data-clip04-cue="kloster">dem über dem Berge liegenden Kloster</span> führte. Von den Höhen schaute die <span class="clip04-crawl-highlight" data-clip04-cue="neuenstein">Neuenstein auf der Sohlbergseite</span> und <span class="clip04-crawl-highlight" data-clip04-cue="baerenburg">die Bärenburg vom Schärtenkopf</span> her in den Urwald hinab.
+Es war in der Zeit, als noch sumpfiger Wald im Renchtal stand und der wilde Fluß bald da, bald dort seinen Weg suchte. <span class="clip04-crawl-highlight" data-clip04-cue="strasse">Die Straße lief oben die Höhe entlang</span>, und nur selten durchstreifte ein Jäger die ungesunden Niederungen. Nur bis zum <span class="clip04-crawl-highlight" data-clip04-cue="gedoes">Getöse</span>, der engen Talstelle, durch die sich der Fluß mit lautem Rauschen preßte, waren die Hirten in den Wald vorgedrungen. Dort stand auch die kleine hölzerne Kapelle, von der ein schmaler Pfad nach <span class="clip04-crawl-highlight" data-clip04-cue="kloster">dem über dem Berge liegenden Kloster</span> führte. Von den Höhen schaute die <span class="clip04-crawl-highlight" data-clip04-cue="neuenstein">Neuenstein auf der Sohlbergseite</span> und <span class="clip04-crawl-highlight" data-clip04-cue="baerenburg">die Bärenburg vom Schärtenkopf</span> her in den Urwald hinab.
 
 Die Menschen waren eigentlich nicht anders als in unseren Tagen. In gleicher Weise schwellte Leid und Freude ihre Brust. Sie liebten ihre Heimat und liebten auch sich, sie bangten und litten, sie fühlten Sehnen und Zagen, sie haßten und kämpften — alles war in der wenig anderen Umgebung wie heute —.
 
@@ -1843,19 +1843,57 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
   crawlWindow.appendChild(crawl); content.append(book, desk, crawlWindow); scene.append(background, content); layer.appendChild(scene);
 
   const clip04CueImages = {
+    strasse: ["assets/clip04/cue-strasse.png", "right"],
     gedoes: ["assets/clip04/cue-getoese.png", "left"],
     kloster: ["assets/clip04/cue-kloster.png", "left"],
-    neuenstein: ["assets/clip04/cue-neuenstein.png", "left"],
-    baerenburg: ["assets/clip04/cue-baerenburg.png", "right"]
+    // Positionen bewusst getauscht: Bärenburg links, Neuenstein rechts.
+    neuenstein: ["assets/clip04/cue-neuenstein.png", "right"],
+    baerenburg: ["assets/clip04/cue-baerenburg.png", "left"]
   };
   const clip04CueState = new Set();
   const clip04CueElements = {};
+  const clip04CueQueue = [];
+  let clip04CueBusy = false;
+  let clip04CastlePairQueued = false;
+
   Object.entries(clip04CueImages).forEach(([key, [src, side]]) => {
     const img = document.createElement("img");
     img.className = `clip04-cue-image clip04-cue-image--${side}`;
     img.src = src; img.alt = ""; img.draggable = false;
     content.appendChild(img); clip04CueElements[key] = img;
   });
+
+  const runClip04CueQueue = async () => {
+    if (clip04CueBusy || token !== clip04RunToken) return;
+    clip04CueBusy = true;
+
+    while (clip04CueQueue.length && token === clip04RunToken) {
+      const keys = clip04CueQueue.shift();
+      const images = keys.map((key) => clip04CueElements[key]).filter(Boolean);
+      images.forEach((img) => requestAnimationFrame(() => img.classList.add("is-visible")));
+
+      // Jedes Bild / Bildpaar steht 3 Sekunden sichtbar.
+      if (!(await waitClip04(3000, token))) return;
+      images.forEach((img) => img.classList.remove("is-visible"));
+
+      // Erst vollständig ausfaden, dann darf die nächste Bildgruppe erscheinen.
+      if (!(await waitClip04(560, token))) return;
+    }
+
+    clip04CueBusy = false;
+  };
+
+  const queueClip04Cue = (key) => {
+    if (key === "neuenstein" || key === "baerenburg") {
+      if (clip04CastlePairQueued) return;
+      clip04CastlePairQueued = true;
+      // Die beiden Burgen bleiben das gewollte gleichzeitige Paar – jetzt mit getauschten Seiten.
+      clip04CueQueue.push(["baerenburg", "neuenstein"]);
+    } else {
+      clip04CueQueue.push([key]);
+    }
+    runClip04CueQueue();
+  };
 
   const watchClip04Cues = () => {
     if (token !== clip04RunToken) return;
@@ -1868,15 +1906,7 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine Fehde 
       const readableBottom = winRect.bottom - Math.min(48, winRect.height * .12);
       if (r.bottom >= readableTop && r.top <= readableBottom) {
         clip04CueState.add(key);
-        const img = clip04CueElements[key];
-        if (img) {
-          requestAnimationFrame(() => img.classList.add("is-visible"));
-          const timer = setTimeout(() => {
-            clip04Timers.delete(timer);
-            if (token === clip04RunToken) img.classList.remove("is-visible");
-          }, 3000);
-          clip04Timers.add(timer);
-        }
+        queueClip04Cue(key);
       }
     });
     requestAnimationFrame(watchClip04Cues);
