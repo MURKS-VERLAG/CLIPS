@@ -19,6 +19,9 @@ const clip05Timers = new Set();
 const clip05PencilSound = new Audio("assets/clip05/pencil-drawing.wav");
 clip05PencilSound.preload = "auto";
 clip05PencilSound.volume = .72;
+const clip05SwordSlashSound = new Audio("assets/clip05/sword-slash.mp3");
+clip05SwordSlashSound.preload = "auto";
+clip05SwordSlashSound.volume = 1;
 
 function getClip05Layer() { return document.getElementById("clip05AnimationLayer"); }
 
@@ -47,6 +50,7 @@ function stopClip05Animation() {
   clip05Timers.forEach((timer) => clearTimeout(timer));
   clip05Timers.clear();
   stopClip05PencilSound();
+  try { clip05SwordSlashSound.pause(); clip05SwordSlashSound.currentTime = 0; } catch (_) {}
   const layer = getClip05Layer();
   if (layer) layer.innerHTML = "";
 }
@@ -2072,12 +2076,14 @@ async function playClip05() {
   wrap.innerHTML = `
     <svg class="clip05-doodle-svg" viewBox="0 0 600 700" aria-hidden="true">
       <!-- TOPFHELM: bewusst einzelne Linien, damit nichts auf einen Schlag entsteht. -->
+      <g class="clip05-doodle-helmet">
       <path class="clip05-doodle-line" data-step="helmet-top" d="M225 110 Q300 65 375 110"/>
       <path class="clip05-doodle-line" data-step="helmet-right" d="M375 110 L365 245"/>
       <path class="clip05-doodle-line" data-step="helmet-bottom" d="M365 245 Q300 275 235 245"/>
       <path class="clip05-doodle-line" data-step="helmet-left" d="M235 245 L225 110"/>
       <path class="clip05-doodle-line" data-step="helmet-slit" d="M245 160 L355 160"/>
       <path class="clip05-doodle-line" data-step="helmet-cross" d="M300 132 L300 210"/>
+      </g>
 
       <path class="clip05-doodle-line" data-step="body-spine" d="M300 270 L300 480"/>
       <path class="clip05-doodle-line" data-step="body-arm-left" d="M300 315 L215 390"/>
@@ -2101,7 +2107,16 @@ async function playClip05() {
   const dust = document.createElement("div");
   dust.className = "clip05-dust";
   wrap.append(pencil, dust);
-  scene.append(background, wrap);
+
+  const slashTop = document.createElement("img");
+  slashTop.className = "clip05-slash-knight clip05-slash-knight--top";
+  slashTop.src = "assets/clip05/knight-slash-top-left.png"; slashTop.alt = ""; slashTop.draggable = false;
+  const slashBottom = document.createElement("img");
+  slashBottom.className = "clip05-slash-knight clip05-slash-knight--bottom";
+  slashBottom.src = "assets/clip05/knight-slash-bottom-right.png"; slashBottom.alt = ""; slashBottom.draggable = false;
+  const slashLine = document.createElement("div");
+  slashLine.className = "clip05-slash-line";
+  scene.append(background, wrap, slashTop, slashBottom, slashLine);
   layer.appendChild(scene);
 
   const steps = [
@@ -2185,6 +2200,30 @@ async function playClip05() {
     if (!ok || token !== clip05RunToken) return;
     if (!(await waitClip05(90, token))) return;
   }
+
+  // Direkt nach Fertigstellung: Anhang 1 wächst links oben 2,5 s von winzig auf groß.
+  requestAnimationFrame(() => slashTop.classList.add("is-growing"));
+  if (!(await waitClip05(2500, token))) return;
+  if (!(await waitClip05(500, token))) return;
+
+  // Harter Bildwechsel + Schnittlinie + Sound im exakt selben Moment.
+  slashTop.classList.add("is-gone");
+  slashBottom.classList.add("is-visible");
+  slashLine.classList.add("is-cutting");
+  const helmetGroup = wrap.querySelector(".clip05-doodle-helmet");
+  if (helmetGroup) helmetGroup.classList.add("is-slashed-away");
+  try {
+    clip05SwordSlashSound.pause(); clip05SwordSlashSound.currentTime = 0; clip05SwordSlashSound.volume = 1;
+    const p = clip05SwordSlashSound.play(); if (p && typeof p.catch === "function") p.catch(() => {});
+  } catch (_) {}
+
+  // Schnitt und Helm brauchen 1,5 s bis sie vollständig verschwunden sind.
+  if (!(await waitClip05(1500, token))) return;
+  slashLine.classList.remove("is-cutting");
+
+  // Anhang 2 steht insgesamt 2 s und fadet danach smooth aus.
+  if (!(await waitClip05(500, token))) return;
+  slashBottom.classList.add("is-fading");
 }
 
 
