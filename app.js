@@ -13,6 +13,51 @@ const clip02Timers = new Set();
 let clip03RunToken = 0;
 const clip03Timers = new Set();
 
+
+let clip05RunToken = 0;
+const clip05Timers = new Set();
+const clip05PencilSound = new Audio("assets/clip05/pencil-drawing.wav");
+clip05PencilSound.preload = "auto";
+clip05PencilSound.volume = .72;
+
+function getClip05Layer() {
+  return document.getElementById("clip05AnimationLayer");
+}
+
+function waitClip05(ms, token) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      clip05Timers.delete(timer);
+      resolve(token === clip05RunToken);
+    }, ms);
+    clip05Timers.add(timer);
+  });
+}
+
+function stopClip05PencilSound() {
+  try { clip05PencilSound.pause(); clip05PencilSound.currentTime = 0; } catch (_) {}
+}
+
+function startClip05PencilSound() {
+  try {
+    clip05PencilSound.pause();
+    clip05PencilSound.currentTime = 0;
+    clip05PencilSound.loop = true;
+    clip05PencilSound.volume = .72;
+    const p = clip05PencilSound.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  } catch (_) {}
+}
+
+function stopClip05Animation() {
+  clip05RunToken += 1;
+  clip05Timers.forEach((timer) => clearTimeout(timer));
+  clip05Timers.clear();
+  stopClip05PencilSound();
+  const layer = getClip05Layer();
+  if (layer) layer.innerHTML = "";
+}
+
 let clip04RunToken = 0;
 const clip04Timers = new Set();
 const clip04Soundtrack = new Audio("assets/clip04/stained-glass.mp3");
@@ -2012,6 +2057,118 @@ Eines Tages kam das Schlimmste: <span class="clip04-crawl-highlight">Eine <span 
   });
 }
 
+
+async function playClip05() {
+  stopClip05Animation();
+  const token = clip05RunToken;
+  const layer = getClip05Layer();
+  if (!layer) return;
+  layer.innerHTML = "";
+
+  const scene = document.createElement("div");
+  scene.className = "clip05-iris-scene";
+
+  const background = document.createElement("img");
+  background.className = "clip05-background";
+  background.src = "assets/clip-frame-grid.png";
+  background.alt = "";
+  background.draggable = false;
+
+  const wrap = document.createElement("div");
+  wrap.className = "clip05-doodle-wrap";
+  wrap.innerHTML = `
+    <svg class="clip05-doodle-svg" viewBox="0 0 600 700" aria-hidden="true">
+      <!-- 1: simpler Topfhelm mit Kreuzschlitz -->
+      <path class="clip05-doodle-line" data-part="helmet" d="M225 110 Q300 65 375 110 L365 245 Q300 275 235 245 Z M245 160 L355 160 M300 132 L300 210"/>
+      <!-- 2: Strichkörper + Arme/Beine -->
+      <path class="clip05-doodle-line" data-part="body" d="M300 270 L300 480 M300 315 L215 390 M300 315 L390 380 M300 480 L235 610 M300 480 L365 610"/>
+      <!-- 3: simples Strichschwert -->
+      <path class="clip05-doodle-line" data-part="sword" d="M214 390 L125 505 M105 480 L150 515 M125 505 L110 535"/>
+      <!-- 4: runder Kreisschild -->
+      <path class="clip05-doodle-line" data-part="shield" d="M390 350 C470 350 500 405 485 485 C470 555 420 585 390 600 C360 585 310 555 295 485 C280 405 310 350 390 350 Z M390 392 A55 55 0 1 1 389.9 392"/>
+    </svg>
+  `;
+
+  const pencil = document.createElement("div");
+  pencil.className = "clip05-pencil";
+  const dust = document.createElement("div");
+  dust.className = "clip05-dust";
+  wrap.append(pencil, dust);
+  scene.append(background, wrap);
+  layer.appendChild(scene);
+
+  const parts = [
+    { name: "helmet", duration: 2200 },
+    { name: "body", duration: 1900 },
+    { name: "sword", duration: 1500 },
+    { name: "shield", duration: 2300 }
+  ];
+
+  const paths = [...wrap.querySelectorAll(".clip05-doodle-line")];
+  paths.forEach((path) => {
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = `${len}`;
+    path.style.strokeDashoffset = `${len}`;
+  });
+
+  // 1 Sekunde komplett schwarz.
+  if (!(await waitClip05(1000, token))) return;
+
+  // Iris von innen nach außen.
+  requestAnimationFrame(() => scene.classList.add("is-revealing"));
+  if (!(await waitClip05(2000, token))) return;
+  scene.classList.add("is-revealed");
+
+  // Nach vollständig sichtbarem Hintergrund noch 2 Sekunden warten.
+  if (!(await waitClip05(2000, token))) return;
+
+  const drawPart = (part, duration) => new Promise((resolve) => {
+    const path = wrap.querySelector(`[data-part="${part}"]`);
+    if (!path || token !== clip05RunToken) { resolve(false); return; }
+
+    const len = path.getTotalLength();
+    const started = performance.now();
+    pencil.classList.add("is-visible");
+    startClip05PencilSound();
+
+    const frame = (now) => {
+      if (token !== clip05RunToken) { resolve(false); return; }
+      const progress = Math.min(1, (now - started) / duration);
+      path.style.strokeDashoffset = `${len * (1 - progress)}`;
+
+      const point = path.getPointAtLength(len * progress);
+      pencil.style.left = `${(point.x / 600) * 100}%`;
+      pencil.style.top = `${(point.y / 700) * 100}%`;
+      dust.style.left = `${(point.x / 600) * 100}%`;
+      dust.style.top = `${(point.y / 700) * 100}%`;
+
+      if (Math.floor((now - started) / 90) !== Math.floor((now - started - 16) / 90)) {
+        dust.classList.remove("is-active");
+        void dust.offsetWidth;
+        dust.classList.add("is-active");
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        stopClip05PencilSound();
+        pencil.classList.remove("is-visible");
+        dust.classList.remove("is-active");
+        resolve(true);
+      }
+    };
+    requestAnimationFrame(frame);
+  });
+
+  // Exakte Reihenfolge: Helm -> Körper -> Schwert -> Schild.
+  for (const part of parts) {
+    const ok = await drawPart(part.name, part.duration);
+    if (!ok || token !== clip05RunToken) return;
+    if (!(await waitClip05(220, token))) return;
+  }
+}
+
+
 function getFrameForClip(clipNumber) {
   if (clipNumber >= 21 && clipNumber <= 40) {
     return "assets/clip-frame-grid.png";
@@ -2450,6 +2607,7 @@ function openClip(clipNumber) {
   stopClip02Animation();
   stopClip03Animation();
   stopClip04Animation();
+  stopClip05Animation();
 
   clipStage.dataset.activeClip = String(clipNumber);
 
@@ -2486,6 +2644,8 @@ function openClip(clipNumber) {
     requestAnimationFrame(() => playClip03());
   } else if (clipNumber === 4) {
     requestAnimationFrame(() => playClip04());
+  } else if (clipNumber === 5) {
+    requestAnimationFrame(() => playClip05());
   }
 }
 
@@ -2498,6 +2658,7 @@ function closeClip() {
   stopClip02Animation();
   stopClip03Animation();
   stopClip04Animation();
+  stopClip05Animation();
 
   clipStage.hidden = true;
   clipStage.style.setProperty("display", "none", "important");
