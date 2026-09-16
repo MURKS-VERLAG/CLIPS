@@ -1635,13 +1635,13 @@
     .clip05-doodle-wrap{position:absolute;left:50%;top:51%;z-index:3;width:min(48vw,760px);height:min(68vh,720px);transform:translate(-50%,-50%);}
     .clip05-doodle-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
     .clip05-doodle-line{fill:none;stroke:#111;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;}
-    .clip05-pencil{position:absolute;z-index:8;width:clamp(80px,9vw,150px);height:18px;transform:translate(-10%,-50%) rotate(-35deg);transform-origin:10% 50%;opacity:0;pointer-events:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.28));}
+    .clip05-pencil{position:absolute;z-index:8;width:clamp(135px,14vw,235px);height:28px;transform:translate(0,-50%) rotate(var(--pencil-angle,-35deg));transform-origin:0 50%;opacity:0;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3));}
     .clip05-pencil.is-visible{opacity:1;}
-    .clip05-pencil::before{content:"";position:absolute;left:0;top:3px;width:78%;height:12px;border-radius:2px;background:linear-gradient(to bottom,#e3b73d 0 22%,#f3d261 23% 68%,#c99727 69% 100%);box-shadow:inset 0 0 0 1px rgba(80,55,12,.35);}
-    .clip05-pencil::after{content:"";position:absolute;right:0;top:3px;width:24%;height:12px;background:linear-gradient(135deg,#e9d5ae 0 47%,#333 48% 58%,transparent 59%);clip-path:polygon(0 0,100% 50%,0 100%);}
-    .clip05-dust{position:absolute;z-index:7;width:5px;height:5px;border-radius:50%;background:rgba(45,38,31,.42);opacity:0;pointer-events:none;box-shadow:7px 3px 0 rgba(55,45,36,.27),-5px 7px 0 rgba(70,58,45,.22),4px -6px 0 rgba(40,35,30,.18);}
+    .clip05-pencil::before{content:"";position:absolute;left:20%;top:5px;width:80%;height:18px;border-radius:2px;background:linear-gradient(to bottom,#e3b73d 0 22%,#f3d261 23% 68%,#c99727 69% 100%);box-shadow:inset 0 0 0 1px rgba(80,55,12,.35);}
+    .clip05-pencil::after{content:"";position:absolute;left:0;top:5px;width:22%;height:18px;background:linear-gradient(225deg,#e9d5ae 0 47%,#292929 48% 59%,transparent 60%);clip-path:polygon(100% 0,0 50%,100% 100%);}
+    .clip05-dust{position:absolute;z-index:9;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,rgba(35,31,27,.52) 0 16%,rgba(70,60,50,.28) 32%,transparent 70%);opacity:0;pointer-events:none;filter:blur(.45px);box-shadow:9px 2px 0 rgba(45,39,33,.28),-7px 7px 0 rgba(65,55,46,.24),4px -8px 0 rgba(40,35,30,.22),12px 9px 0 rgba(70,60,50,.16),-11px -3px 0 rgba(45,40,35,.15);}
     .clip05-dust.is-active{animation:clip05Dust .34s ease-out forwards;}
-    @keyframes clip05Dust{0%{opacity:.55;transform:translate(0,0) scale(.65);}100%{opacity:0;transform:translate(-8px,10px) scale(1.55);}}
+    @keyframes clip05Dust{0%{opacity:.72;transform:translate(-50%,-50%) scale(.65);}100%{opacity:0;transform:translate(-50%,-50%) translate(-5px,8px) scale(1.9);}}100%{opacity:0;transform:translate(-8px,10px) scale(1.55);}}
 
 
     /* CLIP 04: bestehende Iris + neuer Sagen-Hintergrund / sichere Inhaltszone. */
@@ -1732,6 +1732,6 @@
     <div id="clip05AnimationLayer" class="clip05-animation-layer"></div>
   </section>
 
-  <script src="app.js?v=clip05-doodle-01"></script>
+  <script src="app.js?v=clip05-pencil-tip-fix-02"></script>
 </body>
 </html>

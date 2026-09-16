@@ -20,9 +20,7 @@ const clip05PencilSound = new Audio("assets/clip05/pencil-drawing.wav");
 clip05PencilSound.preload = "auto";
 clip05PencilSound.volume = .72;
 
-function getClip05Layer() {
-  return document.getElementById("clip05AnimationLayer");
-}
+function getClip05Layer() { return document.getElementById("clip05AnimationLayer"); }
 
 function waitClip05(ms, token) {
   return new Promise((resolve) => {
@@ -33,22 +31,17 @@ function waitClip05(ms, token) {
     clip05Timers.add(timer);
   });
 }
-
 function stopClip05PencilSound() {
   try { clip05PencilSound.pause(); clip05PencilSound.currentTime = 0; } catch (_) {}
 }
-
 function startClip05PencilSound() {
   try {
-    clip05PencilSound.pause();
-    clip05PencilSound.currentTime = 0;
-    clip05PencilSound.loop = true;
-    clip05PencilSound.volume = .72;
+    clip05PencilSound.pause(); clip05PencilSound.currentTime = 0;
+    clip05PencilSound.loop = true; clip05PencilSound.volume = .72;
     const p = clip05PencilSound.play();
     if (p && typeof p.catch === "function") p.catch(() => {});
   } catch (_) {}
 }
-
 function stopClip05Animation() {
   clip05RunToken += 1;
   clip05Timers.forEach((timer) => clearTimeout(timer));
@@ -2078,14 +2071,28 @@ async function playClip05() {
   wrap.className = "clip05-doodle-wrap";
   wrap.innerHTML = `
     <svg class="clip05-doodle-svg" viewBox="0 0 600 700" aria-hidden="true">
-      <!-- 1: simpler Topfhelm mit Kreuzschlitz -->
-      <path class="clip05-doodle-line" data-part="helmet" d="M225 110 Q300 65 375 110 L365 245 Q300 275 235 245 Z M245 160 L355 160 M300 132 L300 210"/>
-      <!-- 2: Strichkörper + Arme/Beine -->
-      <path class="clip05-doodle-line" data-part="body" d="M300 270 L300 480 M300 315 L215 390 M300 315 L390 380 M300 480 L235 610 M300 480 L365 610"/>
-      <!-- 3: simples Strichschwert -->
-      <path class="clip05-doodle-line" data-part="sword" d="M214 390 L125 505 M105 480 L150 515 M125 505 L110 535"/>
-      <!-- 4: runder Kreisschild -->
-      <path class="clip05-doodle-line" data-part="shield" d="M390 350 C470 350 500 405 485 485 C470 555 420 585 390 600 C360 585 310 555 295 485 C280 405 310 350 390 350 Z M390 392 A55 55 0 1 1 389.9 392"/>
+      <!-- TOPFHELM: bewusst einzelne Linien, damit nichts auf einen Schlag entsteht. -->
+      <path class="clip05-doodle-line" data-step="helmet-top" d="M225 110 Q300 65 375 110"/>
+      <path class="clip05-doodle-line" data-step="helmet-right" d="M375 110 L365 245"/>
+      <path class="clip05-doodle-line" data-step="helmet-bottom" d="M365 245 Q300 275 235 245"/>
+      <path class="clip05-doodle-line" data-step="helmet-left" d="M235 245 L225 110"/>
+      <path class="clip05-doodle-line" data-step="helmet-slit" d="M245 160 L355 160"/>
+      <path class="clip05-doodle-line" data-step="helmet-cross" d="M300 132 L300 210"/>
+
+      <path class="clip05-doodle-line" data-step="body-spine" d="M300 270 L300 480"/>
+      <path class="clip05-doodle-line" data-step="body-arm-left" d="M300 315 L215 390"/>
+      <path class="clip05-doodle-line" data-step="body-arm-right" d="M300 315 L390 380"/>
+      <path class="clip05-doodle-line" data-step="body-leg-left" d="M300 480 L235 610"/>
+      <path class="clip05-doodle-line" data-step="body-leg-right" d="M300 480 L365 610"/>
+
+      <!-- SCHWERT: Griff beginnt direkt an der Hand, danach Parierstange und Klinge nach unten außen. -->
+      <path class="clip05-doodle-line" data-step="sword-grip" d="M215 390 L198 411"/>
+      <path class="clip05-doodle-line" data-step="sword-guard" d="M180 397 L214 424"/>
+      <path class="clip05-doodle-line" data-step="sword-blade" d="M198 411 L118 525"/>
+      <path class="clip05-doodle-line" data-step="sword-tip" d="M118 525 L127 496"/>
+
+      <path class="clip05-doodle-line" data-step="shield-outer" d="M390 350 C470 350 500 405 485 485 C470 555 420 585 390 600 C360 585 310 555 295 485 C280 405 310 350 390 350 Z"/>
+      <path class="clip05-doodle-line" data-step="shield-boss" d="M390 392 A55 55 0 1 1 389.9 392"/>
     </svg>
   `;
 
@@ -2097,57 +2104,70 @@ async function playClip05() {
   scene.append(background, wrap);
   layer.appendChild(scene);
 
-  const parts = [
-    { name: "helmet", duration: 2200 },
-    { name: "body", duration: 1900 },
-    { name: "sword", duration: 1500 },
-    { name: "shield", duration: 2300 }
+  const steps = [
+    ["helmet-top", 520], ["helmet-right", 420], ["helmet-bottom", 520], ["helmet-left", 420],
+    ["helmet-slit", 470], ["helmet-cross", 390],
+    ["body-spine", 650], ["body-arm-left", 430], ["body-arm-right", 430],
+    ["body-leg-left", 500], ["body-leg-right", 500],
+    ["sword-grip", 300], ["sword-guard", 300], ["sword-blade", 720], ["sword-tip", 260],
+    ["shield-outer", 1700], ["shield-boss", 720]
   ];
 
-  const paths = [...wrap.querySelectorAll(".clip05-doodle-line")];
-  paths.forEach((path) => {
+  const allPaths = [...wrap.querySelectorAll(".clip05-doodle-line")];
+  allPaths.forEach((path) => {
     const len = path.getTotalLength();
     path.style.strokeDasharray = `${len}`;
     path.style.strokeDashoffset = `${len}`;
   });
 
-  // 1 Sekunde komplett schwarz.
   if (!(await waitClip05(1000, token))) return;
-
-  // Iris von innen nach außen.
   requestAnimationFrame(() => scene.classList.add("is-revealing"));
   if (!(await waitClip05(2000, token))) return;
   scene.classList.add("is-revealed");
-
-  // Nach vollständig sichtbarem Hintergrund noch 2 Sekunden warten.
   if (!(await waitClip05(2000, token))) return;
 
-  const drawPart = (part, duration) => new Promise((resolve) => {
-    const path = wrap.querySelector(`[data-part="${part}"]`);
+  const drawPath = (step, duration) => new Promise((resolve) => {
+    const path = wrap.querySelector(`[data-step="${step}"]`);
     if (!path || token !== clip05RunToken) { resolve(false); return; }
 
     const len = path.getTotalLength();
     const started = performance.now();
+    let lastPoint = path.getPointAtLength(0);
+    let lastDustAt = 0;
     pencil.classList.add("is-visible");
     startClip05PencilSound();
 
     const frame = (now) => {
       if (token !== clip05RunToken) { resolve(false); return; }
       const progress = Math.min(1, (now - started) / duration);
-      path.style.strokeDashoffset = `${len * (1 - progress)}`;
+      const currentLength = len * progress;
+      path.style.strokeDashoffset = `${len - currentLength}`;
 
-      const point = path.getPointAtLength(len * progress);
+      const point = path.getPointAtLength(currentLength);
+      const lookAhead = path.getPointAtLength(Math.min(len, currentLength + Math.max(2, len * .012)));
+      let dx = lookAhead.x - point.x;
+      let dy = lookAhead.y - point.y;
+      if (Math.abs(dx) + Math.abs(dy) < .001) {
+        dx = point.x - lastPoint.x; dy = point.y - lastPoint.y;
+      }
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI + 180;
+
+      // Die linke Bleistiftspitze IST der SVG-Punkt, an dem die Linie gerade entsteht.
       pencil.style.left = `${(point.x / 600) * 100}%`;
       pencil.style.top = `${(point.y / 700) * 100}%`;
+      pencil.style.setProperty("--pencil-angle", `${angle}deg`);
+
+      // Staub sitzt exakt auf demselben Punkt und kaschiert den Kontakt minimal.
       dust.style.left = `${(point.x / 600) * 100}%`;
       dust.style.top = `${(point.y / 700) * 100}%`;
-
-      if (Math.floor((now - started) / 90) !== Math.floor((now - started - 16) / 90)) {
+      if (now - lastDustAt > 72) {
+        lastDustAt = now;
         dust.classList.remove("is-active");
         void dust.offsetWidth;
         dust.classList.add("is-active");
       }
 
+      lastPoint = point;
       if (progress < 1) {
         requestAnimationFrame(frame);
       } else {
@@ -2160,11 +2180,10 @@ async function playClip05() {
     requestAnimationFrame(frame);
   });
 
-  // Exakte Reihenfolge: Helm -> Körper -> Schwert -> Schild.
-  for (const part of parts) {
-    const ok = await drawPart(part.name, part.duration);
+  for (const [step, duration] of steps) {
+    const ok = await drawPath(step, duration);
     if (!ok || token !== clip05RunToken) return;
-    if (!(await waitClip05(220, token))) return;
+    if (!(await waitClip05(90, token))) return;
   }
 }
 
